@@ -1,0 +1,14 @@
+{
+  "name": "hwp-convert",
+  "version": "1.0.0",
+  "description": "Cloud Run 서비스 — HWP(구형 바이너리)를 LibreOffice headless로 텍스트 변환. functions/의 DTL-009 파이프라인이 HWP 파일일 때만 호출한다.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

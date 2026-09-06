@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Pretendard", -apple-system, "Malgun Gothic", sans-serif;
+
+  /* 7.2 컬러 토큰 */
+  --color-cream-50: #fffefc;
+  --color-cream-100: #faf8f3;
+  --color-cream-200: #f4f0e6;
+  --color-cream-400: #ddd4c0;
+  --color-cream-600: #a89878;
+  --color-cream-800: #5f5342;
+
+  --color-clay-50: #fbf1ec;
+  --color-clay-100: #f5ddd0;
+  --color-clay-400: #cc785c;
+  --color-clay-600: #9c4a31;
+  --color-clay-800: #5e2b1b;
+
+  --color-ink-50: #f7f6f3;
+  --color-ink-100: #edebe5;
+  --color-ink-300: #b8b2a3;
+  --color-ink-400: #928a78;
+  --color-ink-600: #504a3d;
+  --color-ink-800: #26221c;
+
+  --color-sage-100: #e4eedd;
+  --color-sage-400: #7fa968;
+  --color-sage-600: #557a41;
+  --color-sage-800: #35502a;
+
+  --color-amber-100: #f6e8d2;
+  --color-amber-400: #d9a44e;
+  --color-amber-600: #b07e2e;
+  --color-amber-800: #7a5a1e;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream-200);
+  color: var(--color-ink-800);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
