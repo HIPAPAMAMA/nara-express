@@ -1,7 +1,7 @@
 const express = require('express');
 const { computeChunks } = require('../lib/chunk');
-const { createJob, getJob, toPublicJob } = require('../lib/jobStore');
-const { runJob } = require('../lib/searchJob');
+const { createJob, getJob, saveJob } = require('../lib/jobStore');
+const { stepJob } = require('../lib/searchJob');
 
 const router = express.Router();
 
@@ -14,9 +14,9 @@ function withinDays(from, to) {
   return days >= 0;
 }
 
-// SRC-006: 조회하기 — 잡을 생성하고 백그라운드로 청크 처리를 시작한다.
-// mode='quick'(빠른조회): 최근 1개 청크만. mode='full'(정밀조회): 전체 범위 순차 처리.
-router.post('/:kind/jobs', (req, res) => {
+// SRC-006: 조회하기 — 잡을 만들기만 하고, 청크 처리는 안 한다 (호출 하나를 가볍게 유지).
+// mode='quick'(빠른조회): 최근 1개 청크만. mode='full'(정밀조회): 전체 범위.
+router.post('/:kind/jobs', async (req, res) => {
   const kind = KIND_MAP[req.params.kind];
   if (!kind) return res.status(400).json({ message: `알 수 없는 데이터 유형: ${req.params.kind}` });
 
@@ -28,11 +28,13 @@ router.post('/:kind/jobs', (req, res) => {
   const allWindows = computeChunks(from, to);
   const truncated = mode === 'quick' && allWindows.length > 1;
   const targetWindows = mode === 'quick' ? allWindows.slice(-1) : allWindows;
-  // 청크당 1콜 기준 최소 추정치 — 한 구간에 999건 넘는 공고가 있으면 페이지네이션으로 더 소요될 수 있다 (naraClient.MAX_PAGES_PER_CALL 참고)
+  // 청크당 1콜 기준 최소 추정치 — 한 구간에 999건 넘는 공고가 있으면 더 소요될 수 있다 (naraClient.MAX_PAGES_PER_CALL 참고)
   const minApiCalls = targetWindows.length * BIZ_COUNT[bizCode];
 
-  const jobId = createJob({
+  const jobId = await createJob({
     kind,
+    bizCode,
+    windows: targetWindows,
     mode,
     bizType,
     range: { from, to },
@@ -40,34 +42,36 @@ router.post('/:kind/jobs', (req, res) => {
     truncated,
     minApiCalls,
     chunkCount: targetWindows.length,
-  });
-
-  runJob(jobId, kind, bizCode, targetWindows, { keywordType, keyword }).catch((e) => {
-    const job = getJob(jobId);
-    if (job) {
-      job.status = 'error';
-      job.errors.push({ message: e.message });
-    }
+    keywordFilter: { keywordType, keyword },
   });
 
   res.json({ jobId, minApiCalls, chunkCount: targetWindows.length, truncated });
 });
 
-// RES-002: 진행률·소요시간 폴링
-router.get('/jobs/:jobId', (req, res) => {
-  const job = getJob(req.params.jobId);
+// RES-002: 진행률 — 이 호출 자체가 청크 1개를 처리한다(프론트가 done 될 때까지 반복 호출).
+router.post('/jobs/:jobId/step', async (req, res) => {
+  const job = await stepJob(req.params.jobId);
   if (!job) return res.status(404).json({ message: '존재하지 않거나 만료된 조회입니다.' });
-  const pub = toPublicJob(job);
-  pub.elapsedMs = pub.elapsedMs ?? Date.now() - pub.startedAt;
-  res.json(pub);
+  res.json(job);
 });
 
-// SRC-007: 조회 중단
-router.post('/jobs/:jobId/cancel', (req, res) => {
-  const job = getJob(req.params.jobId);
+// 읽기 전용 상태 조회 (진행시키지 않고 현재 상태만)
+router.get('/jobs/:jobId', async (req, res) => {
+  const job = await getJob(req.params.jobId);
   if (!job) return res.status(404).json({ message: '존재하지 않거나 만료된 조회입니다.' });
-  job.cancelled = true;
-  for (const controller of job.controllers) controller.abort();
+  res.json(job);
+});
+
+// SRC-007: 조회 중단 — 다음 step 호출부터 더 진행하지 않는다.
+router.post('/jobs/:jobId/cancel', async (req, res) => {
+  const job = await getJob(req.params.jobId);
+  if (!job) return res.status(404).json({ message: '존재하지 않거나 만료된 조회입니다.' });
+  if (job.status === 'running') {
+    job.status = 'cancelled';
+    job.cancelled = true;
+    job.elapsedMs = Date.now() - job.startedAt;
+    await saveJob(job);
+  }
   res.json({ ok: true });
 });
 

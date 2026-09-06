@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import SearchForm from './SearchForm';
 import ResultsList from '../results/ResultsList';
 import SummaryPanel from '../results/SummaryPanel';
-import { createSearchJob, getSearchJob, cancelSearchJob } from '../../api/client';
+import { createSearchJob, stepSearchJob, cancelSearchJob } from '../../api/client';
 
 const POLL_INTERVAL_MS = 400;
 
@@ -53,10 +53,11 @@ export default function SearchWorkspace({ onOpenDetail, prefill }) {
     };
   }
 
+  // 이 호출 자체가 서버에서 청크 1개를 진행시킨다 (Vercel 서버리스 호환 — 백그라운드 실행에 의존하지 않음)
   async function poll(jobId, params) {
     if (currentJobIdRef.current !== jobId) return; // 새 조회가 시작됐으면 이전 폴링 중단
     try {
-      const jobData = await getSearchJob(jobId);
+      const jobData = await stepSearchJob(jobId);
       setJob(jobData);
       setResponse(buildResponse(jobData, params));
       if (jobData.status === 'running') {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createSearchJob, getSearchJob } from '../../api/client';
+import { createSearchJob, stepSearchJob } from '../../api/client';
 import ResultRow from '../results/ResultRow';
 
 const STORAGE_KEY = 'competitors';
@@ -86,7 +86,7 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
       let jobData;
       do {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-        jobData = await getSearchJob(jobId);
+        jobData = await stepSearchJob(jobId);
       } while (jobData.status === 'running');
 
       const seen = new Map();
@@ -159,7 +159,7 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
         let jobData;
         do {
           await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-          jobData = await getSearchJob(jobId);
+          jobData = await stepSearchJob(jobId);
           setAnalysis((a) => ({ ...a, chunk: { done: i, total: targets.length }, elapsedMs: Date.now() - started }));
         } while (jobData.status === 'running');
         collected.push(...jobData.items);

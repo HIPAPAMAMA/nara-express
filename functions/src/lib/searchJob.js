@@ -1,75 +1,69 @@
 const { search } = require('./naraClient');
 const { normalizeItem } = require('./normalize');
-const { getJob, touch } = require('./jobStore');
+const { getJob, saveJob } = require('./jobStore');
 
-// SRC-005 정밀조회/빠른조회 백그라운드 실행기.
-// 청크("시작일+1개월", chunk.js 참고)를 순차 호출하며 잡 상태를 실시간으로 갱신한다 (6.3 상태 피드백).
+// 2단계 청크 엔진 — Vercel 서버리스 호환을 위해 "한 호출당 청크 1개만 처리"하는 구조.
+// 프론트가 done 상태가 아닐 때까지 이 함수를 반복 호출한다 (SearchWorkspace.jsx의 poll 참고).
 function matchesKeyword(item, keywordFilter) {
   if (!keywordFilter?.keyword) return true;
   const q = keywordFilter.keyword.toLowerCase();
   if (keywordFilter.keywordType === 'company') return (item.winner?.name || '').toLowerCase().includes(q);
-  // CMP-006·010: 경쟁사 등록 목록은 사업자번호로 정확히 매칭한다 (동명이인 업체 혼동 방지)
   if (keywordFilter.keywordType === 'bizno') return item.winner?.bizNo === keywordFilter.keyword;
   return (item.title || '').toLowerCase().includes(q) || (item.bidNo || '').toLowerCase().includes(q);
 }
 
-async function runJob(jobId, kind, bizCode, windows, keywordFilter) {
-  const job = getJob(jobId);
-  if (!job) return;
+/** jobId의 다음 청크 1개를 처리하고 갱신된 job을 반환한다. 이미 끝났으면 그대로 반환. */
+async function stepJob(jobId) {
+  const job = await getJob(jobId);
+  if (!job) return null;
 
-  const seenIds = new Set();
-  job.apiCallCount = 0;
-  job.estimatedTotalAvailable = 0; // API가 알려준 실제 총건수 합 (dedup 전, all업무구분이면 4개 합산)
-  job.truncatedChunks = []; // 청크당 999건 상한에 걸려 못 가져온 구간 — 6.3: 누락 가능성을 숨기지 않는다
+  if (job.status !== 'running') return job; // 이미 done/cancelled — 아무 것도 안 하고 그대로 반환
 
-  for (const window of windows) {
-    if (job.cancelled) break;
-
-    const controller = new AbortController();
-    job.controllers.add(controller);
-    try {
-      const {
-        items: rawItems,
-        errors,
-        truncatedByPageCap,
-        callCount,
-        totalCount,
-        fetchedCount,
-      } = await search(kind, bizCode, {
-        from: window.from.replaceAll('-', ''),
-        to: window.to.replaceAll('-', ''),
-        signal: controller.signal,
-      });
-
-      job.apiCallCount += callCount;
-      job.estimatedTotalAvailable += totalCount;
-      if (truncatedByPageCap) {
-        job.truncatedChunks.push({ ...window, totalCount, fetchedCount });
-      }
-
-      for (const raw of rawItems) {
-        const item = normalizeItem(raw);
-        if (seenIds.has(item.id)) continue; // 6.3·중복제거: 동일 공고번호+차수 단일화
-        seenIds.add(item.id);
-        if (matchesKeyword(item, keywordFilter)) job.items.push(item);
-      }
-      if (errors.length > 0) job.errors.push(...errors.map((e) => ({ ...e, window })));
-    } catch (e) {
-      if (e.name === 'AbortError') {
-        job.controllers.delete(controller);
-        break; // SRC-007 조회 중단
-      }
-      job.errors.push({ window, message: e.message, resultCode: e.resultCode });
-    } finally {
-      job.controllers.delete(controller);
-      job.chunk.done += 1;
-      touch(job);
-    }
+  if (job.cursor >= job.windows.length) {
+    job.status = 'done';
+    job.elapsedMs = Date.now() - job.startedAt;
+    return saveJob(job);
   }
 
-  job.status = job.cancelled ? 'cancelled' : 'done';
-  job.elapsedMs = Date.now() - job.startedAt;
-  touch(job);
+  const window = job.windows[job.cursor];
+  try {
+    const {
+      items: rawItems,
+      errors,
+      truncatedByPageCap,
+      callCount,
+      totalCount,
+      fetchedCount,
+    } = await search(job.kind, job.bizCode, {
+      from: window.from.replaceAll('-', ''),
+      to: window.to.replaceAll('-', ''),
+    });
+
+    job.apiCallCount += callCount;
+    job.estimatedTotalAvailable += totalCount;
+    if (truncatedByPageCap) job.truncatedChunks.push({ ...window, totalCount, fetchedCount });
+
+    const seen = new Set(job.items.map((it) => it.id)); // 6.3·중복제거: 동일 공고번호+차수 단일화
+    for (const raw of rawItems) {
+      const item = normalizeItem(raw);
+      if (seen.has(item.id)) continue;
+      seen.add(item.id);
+      if (matchesKeyword(item, job.keywordFilter)) job.items.push(item);
+    }
+    if (errors.length > 0) job.errors.push(...errors.map((e) => ({ ...e, window })));
+  } catch (e) {
+    job.errors.push({ window, message: e.message, resultCode: e.resultCode });
+  }
+
+  job.cursor += 1;
+  job.chunk.done = job.cursor;
+
+  if (job.cursor >= job.windows.length) {
+    job.status = 'done';
+    job.elapsedMs = Date.now() - job.startedAt;
+  }
+
+  return saveJob(job);
 }
 
-module.exports = { runJob };
+module.exports = { stepJob };

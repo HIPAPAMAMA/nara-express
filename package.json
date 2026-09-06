@@ -1,0 +1,6 @@
+{
+  "name": "nara-express",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NARA Express — Vercel 배포용 루트 매니페스트 (실제 의존성은 functions/, web/ 각각에 있음)"
+}

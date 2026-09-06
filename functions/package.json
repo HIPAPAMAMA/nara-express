@@ -10,6 +10,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@vercel/kv": "^3.0.0",
     "adm-zip": "^0.5.16",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
