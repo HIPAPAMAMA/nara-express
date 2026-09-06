@@ -9,7 +9,8 @@ const companyRoute = require('./routes/company');
 const mallRoute = require('./routes/mall');
 
 const app = express();
-app.use(cors());
+// FRONTEND_ORIGIN이 설정돼 있으면(Render 배포) 그 출처만 허용, 없으면(로컬 개발) 전체 허용
+app.use(cors(process.env.FRONTEND_ORIGIN ? { origin: process.env.FRONTEND_ORIGIN } : {}));
 app.use(express.json({ limit: '1mb' }));
 
 app.use('/api/health', healthRoute);

@@ -1,4 +1,6 @@
-const BASE = '/api';
+// 로컬 개발: '/api' (vite.config.js의 server.proxy가 localhost:5001로 넘겨줌)
+// Render 배포: VITE_API_BASE_URL(render.yaml에서 설정)이 백엔드 서비스의 실제 주소로 대체
+const BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 async function request(path, options) {
   const res = await fetch(`${BASE}${path}`, options);
