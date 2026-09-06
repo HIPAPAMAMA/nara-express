@@ -46,6 +46,7 @@ function normalizeAward(raw) {
     attachments: [],
     contract: null,
     restrictionCheck: null,
+    eligibility: null, // 낙찰정보서비스 응답엔 제한 필드가 없음
   };
 }
 
@@ -78,6 +79,13 @@ function normalizeBid(raw) {
     attachments: collectAttachments(raw, 'ntceSpecFileNm', 'ntceSpecDocUrl', 10),
     contract: null,
     restrictionCheck: null,
+    // MYC-007용 원본 제한 필드 그대로 보존 (가공하지 않음 — 코드값 매핑표가 없어 프론트에서 문자열 그대로 비교)
+    eligibility: {
+      indstrytyLmtYn: raw.indstrytyLmtYn || null, // 업종제한여부
+      rgnLmtBidLocplcJdgmBssNm: raw.rgnLmtBidLocplcJdgmBssNm || null, // 지역제한 기준
+      cmmnSpldmdCorpRgnLmtYn: raw.cmmnSpldmdCorpRgnLmtYn || null, // 공동수급 지역제한여부
+      prdctClsfcLmtYn: raw.prdctClsfcLmtYn || null, // 물품분류제한여부
+    },
   };
 }
 
@@ -108,6 +116,7 @@ function normalizePrespec(raw) {
     attachments: collectAttachments(raw, 'specDocFileNm', 'specDocFileUrl', 5),
     contract: null,
     restrictionCheck: null,
+    eligibility: null, // 사전규격정보서비스 응답엔 제한 필드가 없음
   };
 }
 

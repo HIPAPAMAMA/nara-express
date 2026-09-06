@@ -5,6 +5,8 @@ import DetailPanel from './features/detail/DetailPanel';
 import CompetitorWorkspace from './features/competitor/CompetitorWorkspace';
 import MyCompanyWorkspace from './features/mycompany/MyCompanyWorkspace';
 import MallWorkspace from './features/mall/MallWorkspace';
+import KeywordWorkspace from './features/keyword/KeywordWorkspace';
+import SavedWorkspace from './features/saved/SavedWorkspace';
 import MobileBottomNav from './components/MobileBottomNav';
 import { checkHealth } from './api/client';
 
@@ -33,6 +35,12 @@ export default function App() {
   const [health, setHealth] = useState('checking');
   const [view, setView] = useState('search');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [searchPrefill, setSearchPrefill] = useState(null); // KWD-002: 키워드 클릭 → 검색 실행
+
+  function handleSearchKeyword(keyword) {
+    setSearchPrefill({ keyword, requestedAt: Date.now() });
+    setView('search');
+  }
 
   useEffect(() => {
     checkHealth()
@@ -66,13 +74,13 @@ export default function App() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} />}
+        {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} prefill={searchPrefill} />}
         {view === 'competitor' && <CompetitorWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'company' && <MyCompanyWorkspace />}
         {view === 'mall' && <MallWorkspace />}
+        {view === 'keyword' && <KeywordWorkspace onSearchKeyword={handleSearchKeyword} />}
+        {view === 'saved' && <SavedWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'evaluation' && <Placeholder label="평가분석 (5단계, 보류)" />}
-        {view === 'keyword' && <Placeholder label="관심 키워드" />}
-        {view === 'saved' && <Placeholder label="저장내역" />}
         {view === 'settings' && <Placeholder label="알림·설정" />}
       </main>
 

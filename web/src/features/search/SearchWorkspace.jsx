@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SearchForm from './SearchForm';
 import ResultsList from '../results/ResultsList';
 import SummaryPanel from '../results/SummaryPanel';
@@ -15,7 +15,14 @@ function applyAdvancedFilters(items, params) {
   return list;
 }
 
-export default function SearchWorkspace({ onOpenDetail }) {
+function pad(n) {
+  return String(n).padStart(2, '0');
+}
+function toDateStr(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export default function SearchWorkspace({ onOpenDetail, prefill }) {
   const [job, setJob] = useState(null); // 서버 잡 상태 원본 (진행 중 폴링 결과)
   const [response, setResponse] = useState(null); // ResultsList에 넘길 가공된 결과
   const [loading, setLoading] = useState(false);
@@ -87,10 +94,28 @@ export default function SearchWorkspace({ onOpenDetail }) {
     }
   }
 
+  // KWD-002: 키워드 클릭으로 진입 시 자동으로 조회 실행 (최근 31일, 빠른 조회 기본값)
+  useEffect(() => {
+    if (!prefill?.keyword) return;
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - 31);
+    handleSearch({
+      kind: 'bid',
+      from: toDateStr(from),
+      to: toDateStr(to),
+      bizType: '전체',
+      mode: 'quick',
+      keywordType: 'title',
+      keyword: prefill.keyword,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill?.requestedAt]);
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr]">
       <div className="flex flex-col gap-4">
-        <SearchForm onSearch={handleSearch} loading={loading} onCancel={handleCancel} />
+        <SearchForm onSearch={handleSearch} loading={loading} onCancel={handleCancel} initialKeyword={prefill?.keyword} />
         <SummaryPanel response={response} />
       </div>
       <ResultsList response={response} loading={loading && !response} error={error} onOpenDetail={onOpenDetail} />

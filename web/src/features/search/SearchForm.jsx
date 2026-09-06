@@ -43,11 +43,11 @@ function saveRecent(entry) {
   localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 12))); // SRC-008: 최대 12개
 }
 
-export default function SearchForm({ onSearch, loading, onCancel }) {
+export default function SearchForm({ onSearch, loading, onCancel, initialKeyword }) {
   const today = toDateStr(new Date());
   const [dataType, setDataType] = useState('bid');
   const [keywordType, setKeywordType] = useState('title'); // SRC-002: 사업명·공고번호 / 업체명
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(initialKeyword || '');
   const [from, setFrom] = useState(toDateStr(new Date(Date.now() - 30 * 86400000)));
   const [to, setTo] = useState(today);
   const [bizType, setBizType] = useState('전체'); // SRC-011

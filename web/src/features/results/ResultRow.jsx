@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { formatAmount, formatRate, formatDateTime, deadlineBadge } from '../../lib/format';
 import { DESKTOP_GRID_COLS } from './gridTemplate';
+import { isItemSaved, toggleSavedItem } from '../../lib/savedItems';
 
 function Badge({ tone, children }) {
   const toneClass = {
@@ -21,6 +23,26 @@ function kindBadge(item, badge) {
   if (item.kind === 'award') return <Badge tone="success">낙찰</Badge>;
   if (item.kind === 'bid') return badge ? <Badge tone={badge.tone}>{badge.label}</Badge> : <Badge tone="neutral">공고</Badge>;
   return <Badge tone="neutral">사전규격</Badge>;
+}
+
+// SAV-001: 공고 저장/해제
+function SaveIcon({ item, onToggleSave }) {
+  const [saved, setSaved] = useState(() => isItemSaved(item.id));
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        const nowSaved = toggleSavedItem(item);
+        setSaved(nowSaved);
+        onToggleSave?.(item, nowSaved);
+      }}
+      className={saved ? 'text-clay-600' : 'text-ink-300 hover:text-clay-600'}
+      title={saved ? '저장 해제' : '저장'}
+    >
+      {saved ? '★' : '☆'}
+    </button>
+  );
 }
 
 function CopyIcon({ bidNo, onCopyBidNo }) {
@@ -89,7 +111,7 @@ function MetricCell({ item, badge }) {
   return <span className="text-ink-300">-</span>;
 }
 
-export default function ResultRow({ item, dense, onOpenDetail, onCopyBidNo }) {
+export default function ResultRow({ item, dense, onOpenDetail, onCopyBidNo, onToggleSave }) {
   const badge = item.kind === 'bid' ? deadlineBadge(item.bidDeadline) : null;
 
   return (
@@ -107,6 +129,7 @@ export default function ResultRow({ item, dense, onOpenDetail, onCopyBidNo }) {
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-400">
             <span>{item.bidNo}</span>
             <CopyIcon bidNo={item.bidNo} onCopyBidNo={onCopyBidNo} />
+            <SaveIcon item={item} onToggleSave={onToggleSave} />
             {!dense && <span>· {formatDateTime(item.postedAt, { seconds: true })}</span>}
           </div>
           {!dense && (
@@ -132,6 +155,7 @@ export default function ResultRow({ item, dense, onOpenDetail, onCopyBidNo }) {
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-400">
             <span>{item.bidNo}</span>
             <CopyIcon bidNo={item.bidNo} onCopyBidNo={onCopyBidNo} />
+            <SaveIcon item={item} onToggleSave={onToggleSave} />
             {!dense && <span>· {formatDateTime(item.postedAt, { seconds: true })}</span>}
           </div>
         </div>

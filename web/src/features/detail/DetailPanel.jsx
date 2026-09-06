@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { formatAmount, formatDateTime } from '../../lib/format';
 import { checkRestriction } from '../../api/client';
+import { assessEligibility } from '../../lib/eligibility';
 
 const STATUS_LABEL = {
   restricted: { label: '제한있음', tone: 'bg-amber-100 text-amber-800' },
@@ -8,9 +9,17 @@ const STATUS_LABEL = {
   needs_review: { label: '확인필요', tone: 'bg-ink-100 text-ink-600' },
 };
 
+const FIT_LABEL = {
+  has_restriction: { label: '제한 있음', tone: 'bg-amber-100 text-amber-800' },
+  no_restriction: { label: '제한 없어 보임', tone: 'bg-sage-100 text-sage-600' },
+  unknown: { label: '정보 없음', tone: 'bg-ink-100 text-ink-400' },
+  no_profile: { label: '내 업체 미등록', tone: 'bg-ink-100 text-ink-400' },
+};
+
 export default function DetailPanel({ item, onClose }) {
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState(null);
+  const fitness = useMemo(() => assessEligibility(item, result), [item, result]);
 
   async function runCheck() {
     setChecking(true);
@@ -50,6 +59,24 @@ export default function DetailPanel({ item, onClose }) {
           <div className="text-ink-800">{formatDateTime(item.openingAt)}</div>
           <div className="text-ink-400">추정가격</div>
           <div className="tabular-nums text-ink-800">{formatAmount(item.estimatedPrice)}</div>
+        </div>
+
+        {/* MYC-007 공고 적합도 판정 */}
+        <div className="mb-4 rounded-lg border border-cream-400 p-3">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs font-medium text-ink-600">공고 적합도 (참고용)</span>
+            <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${FIT_LABEL[fitness.status].tone}`}>
+              {FIT_LABEL[fitness.status].label}
+            </span>
+          </div>
+          {fitness.reasons.length > 0 && (
+            <ul className="list-inside list-disc space-y-0.5 text-[11px] text-ink-600">
+              {fitness.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-1 text-[11px] text-ink-300">구조화된 필드 기반 참고 정보입니다. 최종 확인은 원문에서 하세요.</p>
         </div>
 
         {/* DTL-009·010 대기업 참여제한 확인 */}

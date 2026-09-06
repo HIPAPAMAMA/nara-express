@@ -19,6 +19,8 @@ export default function MallWorkspace() {
   const [sort, setSort] = useState('priceAsc');
   const [corpFilter, setCorpFilter] = useState(null);
   const [regionFilter, setRegionFilter] = useState(null);
+  const [priceMinFilter, setPriceMinFilter] = useState(''); // MALL-008
+  const [priceMaxFilter, setPriceMaxFilter] = useState('');
 
   async function handleSearch(e) {
     e.preventDefault();
@@ -59,13 +61,15 @@ export default function MallWorkspace() {
     let list = items || [];
     if (corpFilter) list = list.filter((i) => i.cntrctCorpNm === corpFilter);
     if (regionFilter) list = list.filter((i) => (i.prdctOrgplceNm || '').startsWith(regionFilter));
+    if (priceMinFilter) list = list.filter((i) => (i.cntrctPrceAmt ?? 0) >= Number(priceMinFilter));
+    if (priceMaxFilter) list = list.filter((i) => (i.cntrctPrceAmt ?? 0) <= Number(priceMaxFilter));
     const sorted = [...list];
     if (sort === 'priceAsc') sorted.sort((a, b) => (a.cntrctPrceAmt || 0) - (b.cntrctPrceAmt || 0));
     else if (sort === 'priceDesc') sorted.sort((a, b) => (b.cntrctPrceAmt || 0) - (a.cntrctPrceAmt || 0));
     else if (sort === 'corpNm') sorted.sort((a, b) => (a.cntrctCorpNm || '').localeCompare(b.cntrctCorpNm || ''));
     else if (sort === 'endDate') sorted.sort((a, b) => new Date(a.cntrctEndDate || 0) - new Date(b.cntrctEndDate || 0));
     return sorted;
-  }, [items, sort, corpFilter, regionFilter]);
+  }, [items, sort, corpFilter, regionFilter, priceMinFilter, priceMaxFilter]);
 
   const prices = filtered.map((i) => i.cntrctPrceAmt).filter((n) => n != null);
   const priceMin = prices.length ? Math.min(...prices) : null;
@@ -114,6 +118,26 @@ export default function MallWorkspace() {
               <div className="text-right tabular-nums">{corpCounts.length}곳</div>
               <div>가격대</div>
               <div className="text-right tabular-nums">{priceMin != null ? `${formatAmount(priceMin)} ~ ${formatAmount(priceMax)}` : '-'}</div>
+            </div>
+            <div className="mb-3">
+              <div className="mb-1 font-medium text-ink-600">계약단가 범위</div>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  value={priceMinFilter}
+                  onChange={(e) => setPriceMinFilter(e.target.value)}
+                  placeholder="하한"
+                  className="w-full rounded border border-cream-400 px-1.5 py-1 text-[11px]"
+                />
+                <span className="text-ink-300">~</span>
+                <input
+                  type="number"
+                  value={priceMaxFilter}
+                  onChange={(e) => setPriceMaxFilter(e.target.value)}
+                  placeholder="상한"
+                  className="w-full rounded border border-cream-400 px-1.5 py-1 text-[11px]"
+                />
+              </div>
             </div>
             <div className="mb-1 font-medium text-ink-600">업체</div>
             <div className="mb-3 max-h-32 space-y-0.5 overflow-y-auto">
