@@ -39,6 +39,12 @@
   --color-amber-800: #7a5a1e;
 }
 
+html {
+  /* 핀치줌·더블탭줌 방지 보조 — iOS Safari는 최신 버전에서 viewport meta의
+     user-scalable=no를 접근성 정책상 무시하므로 touch-action으로 한 번 더 막는다 */
+  touch-action: pan-x pan-y;
+}
+
 body {
   margin: 0;
   background: var(--color-cream-200);
