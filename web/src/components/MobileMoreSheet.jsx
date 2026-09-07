@@ -1,7 +1,9 @@
-import { FactoryIcon, CartIcon, BellIcon, ChartIcon } from './icons';
+import { BuildingIcon, FactoryIcon, CartIcon, BellIcon, ChartIcon } from './icons';
 
 // 모바일 하단 탭 '더보기' → 자리가 없는 나머지 화면들로 가는 바텀시트
+// 대시보드가 하단 탭 첫 자리를 차지하면서 경쟁사가 대신 여기로 밀려남
 const ITEMS = [
+  { key: 'competitor', Icon: BuildingIcon, label: '경쟁사' },
   { key: 'company', Icon: FactoryIcon, label: '내 업체' },
   { key: 'mall', Icon: CartIcon, label: '쇼핑몰 상품검색' },
   { key: 'settings', Icon: BellIcon, label: '알림·설정' },

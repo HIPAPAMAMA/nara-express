@@ -1,10 +1,10 @@
-import { SearchIcon, BuildingIcon, StarIcon, FolderIcon, MoreIcon } from './icons';
+import { HomeIcon, SearchIcon, StarIcon, FolderIcon, MoreIcon } from './icons';
 
-// 2장·7.5절: 모바일 하단 고정 5탭 (검색/경쟁사/키워드/저장내역/더보기)
-// 내 업체·쇼핑몰·설정·평가분석은 '더보기' 탭 → MobileMoreSheet로 진입 (자체 탭 자리가 없어서)
+// 모바일 하단 고정 5탭 (대시보드/검색/키워드/저장내역/더보기) — 대시보드가 메인이라 첫 자리 차지,
+// 경쟁사·내 업체·쇼핑몰·설정·평가분석은 '더보기' 탭 → MobileMoreSheet로 진입
 const TABS = [
+  { key: 'dashboard', Icon: HomeIcon, label: '대시보드' },
   { key: 'search', Icon: SearchIcon, label: '검색' },
-  { key: 'competitor', Icon: BuildingIcon, label: '경쟁사' },
   { key: 'keyword', Icon: StarIcon, label: '키워드' },
   { key: 'saved', Icon: FolderIcon, label: '저장내역' },
   { key: 'more', Icon: MoreIcon, label: '더보기' },

@@ -2,6 +2,17 @@
 // 색상(text-clay-600 / text-ink-300)을 그대로 물려받는다. 컬러 이모지 대신 브랜드 톤에 맞춤.
 const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' };
 
+export function HomeIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...common}>
+      <path d="M4 11.5 12 4l8 7.5" />
+      <path d="M6 10v9.5h12V10" />
+      <line x1="10" y1="19.5" x2="10" y2="14.5" />
+      <line x1="14" y1="19.5" x2="14" y2="14.5" />
+    </svg>
+  );
+}
+
 export function SearchIcon({ className }) {
   return (
     <svg viewBox="0 0 24 24" className={className} {...common}>

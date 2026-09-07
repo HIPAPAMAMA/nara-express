@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import logo from './assets/logo-horizontal.png';
+import DashboardWorkspace from './features/dashboard/DashboardWorkspace';
 import SearchWorkspace from './features/search/SearchWorkspace';
 import DetailPanel from './features/detail/DetailPanel';
 import CompetitorWorkspace from './features/competitor/CompetitorWorkspace';
@@ -13,9 +14,10 @@ import MobileMoreSheet from './components/MobileMoreSheet';
 import { checkHealth } from './api/client';
 import { AuthProvider } from './lib/authContext';
 
-// 자주 쓰는 화면(검색·키워드·경쟁사·쇼핑몰·저장내역)을 앞에, 한 번 설정하고 마는 화면
-// (내 업체·알림·설정)과 아직 미구현인 평가분석은 뒤로 — 모바일 더보기 시트 우선순위와 맞춤
+// 대시보드가 매일 들어오는 메인 화면 — 그다음 자주 쓰는 화면(검색·키워드·경쟁사·쇼핑몰·저장내역)을
+// 앞에, 한 번 설정하고 마는 화면(내 업체·알림·설정)과 아직 미구현인 평가분석은 뒤로
 const NAV_TABS = [
+  { key: 'dashboard', label: '대시보드' },
   { key: 'search', label: '통합검색' },
   { key: 'keyword', label: '관심 키워드' },
   { key: 'competitor', label: '경쟁사' },
@@ -26,12 +28,14 @@ const NAV_TABS = [
   { key: 'evaluation', label: '평가분석' },
 ];
 
-// 모바일 하단 탭엔 5자리뿐이라 나머지는 '더보기' 시트로 — 탭 하이라이트도 그쪽으로 맞춘다
+// 모바일 하단 탭엔 5자리뿐이라 나머지는 '더보기' 시트로 — 대시보드가 메인이라 첫 자리를 차지하고,
+// 경쟁사가 대신 더보기로 밀림
 const MOBILE_KEY_MAP = {
+  dashboard: 'dashboard',
   search: 'search',
-  competitor: 'competitor',
   keyword: 'keyword',
   saved: 'saved',
+  competitor: 'more',
   company: 'more',
   mall: 'more',
   settings: 'more',
@@ -56,7 +60,7 @@ export default function App() {
 
 function AppShell() {
   const [health, setHealth] = useState('checking');
-  const [view, setView] = useState('search');
+  const [view, setView] = useState('dashboard');
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchPrefill, setSearchPrefill] = useState(null); // KWD-002: 키워드 클릭 → 검색 실행
   const [moreOpen, setMoreOpen] = useState(false);
@@ -106,6 +110,7 @@ function AppShell() {
       </header>
 
       <main className="mx-auto max-w-[1600px] px-4 py-6">
+        {view === 'dashboard' && <DashboardWorkspace onOpenDetail={setSelectedItem} onNavigate={setView} />}
         {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} prefill={searchPrefill} />}
         {view === 'competitor' && <CompetitorWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'company' && <MyCompanyWorkspace />}
