@@ -5,6 +5,11 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" }
   ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "functions/node_modules/@ohah/hwpjs/dist/{index.js,hwpjs.linux-x64-gnu.node}"
+    }
+  },
   "crons": [
     { "path": "/api/cron/run-alerts", "schedule": "0 0 * * *" }
   ]
