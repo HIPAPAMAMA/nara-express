@@ -97,7 +97,7 @@ export default function MyCompanyWorkspace() {
             value={biznoInput}
             onChange={(e) => setBiznoInput(e.target.value)}
             placeholder="사업자등록번호 (숫자만)"
-            className="flex-1 rounded-md border border-cream-400 px-3 py-2 text-sm"
+            className="min-w-0 flex-1 rounded-md border border-cream-400 px-3 py-2 text-sm"
           />
           <button
             onClick={handleAutoFill}
@@ -185,7 +185,7 @@ export default function MyCompanyWorkspace() {
               onChange={(e) => setQualInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addQualification())}
               placeholder="자격·면허·등록 입력 후 추가"
-              className="flex-1 rounded-md border border-cream-400 px-2 py-1.5 text-sm"
+              className="min-w-0 flex-1 rounded-md border border-cream-400 px-2 py-1.5 text-sm"
             />
             <button onClick={addQualification} className="rounded-md border border-cream-400 px-3 py-1.5 text-xs text-ink-600">
               추가
@@ -216,7 +216,7 @@ export default function MyCompanyWorkspace() {
               onChange={(e) => setPerfInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addPerformance())}
               placeholder="직접 입력"
-              className="flex-1 rounded-md border border-cream-400 px-2 py-1.5 text-sm"
+              className="min-w-0 flex-1 rounded-md border border-cream-400 px-2 py-1.5 text-sm"
             />
             <button onClick={addPerformance} className="rounded-md border border-cream-400 px-3 py-1.5 text-xs text-ink-600">
               추가

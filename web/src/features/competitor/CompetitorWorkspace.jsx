@@ -205,7 +205,7 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
               placeholder="업체명"
-              className="flex-1 rounded-md border border-cream-400 px-2 py-1.5 text-sm"
+              className="min-w-0 flex-1 rounded-md border border-cream-400 px-2 py-1.5 text-sm"
             />
             <button type="submit" disabled={matching} className="rounded-md bg-clay-400 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60">
               {matching ? '검색 중…' : '검색'}

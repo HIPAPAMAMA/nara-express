@@ -151,7 +151,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder={keywordType === 'title' ? '사업명 또는 공고번호 검색' : '업체명 검색'}
-          className="flex-1 rounded-lg border border-cream-400 px-3 py-2 text-sm outline-none focus:border-clay-400"
+          className="min-w-0 flex-1 rounded-lg border border-cream-400 px-3 py-2 text-sm outline-none focus:border-clay-400"
         />
       </div>
 

@@ -177,7 +177,7 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
             value={textFilter}
             onChange={(e) => setTextFilter(e.target.value)}
             placeholder="결과 내 검색"
-            className="flex-1 rounded-md border border-cream-400 px-2 py-1 text-xs"
+            className="min-w-0 flex-1 rounded-md border border-cream-400 px-2 py-1 text-xs"
           />
           <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-md border border-cream-400 px-2 py-1 text-xs">
             {SORT_OPTIONS.map((o) => (

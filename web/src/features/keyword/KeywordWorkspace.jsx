@@ -44,7 +44,7 @@ export default function KeywordWorkspace({ onSearchKeyword }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="키워드 입력 (사업명 기준)"
-            className="flex-1 rounded-md border border-cream-400 px-3 py-2 text-sm"
+            className="min-w-0 flex-1 rounded-md border border-cream-400 px-3 py-2 text-sm"
           />
           <button type="submit" className="rounded-md bg-clay-400 px-4 py-2 text-sm font-medium text-white">
             등록
