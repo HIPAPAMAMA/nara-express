@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import SearchForm from './SearchForm';
 import ReannounceRadar from './ReannounceRadar';
+import OrderPlanRadar from './OrderPlanRadar';
 import ResultsList from '../results/ResultsList';
 import SummaryPanel from '../results/SummaryPanel';
 import { createSearchJob, stepSearchJob, cancelSearchJob } from '../../api/client';
@@ -148,6 +149,7 @@ export default function SearchWorkspace({ onOpenDetail, prefill }) {
       <div className="flex flex-col gap-4">
         <SearchForm onSearch={handleSearch} loading={loading} onCancel={handleCancel} initialKeyword={prefill?.keyword} />
         <ReannounceRadar onSearchBid={handleSearchBid} />
+        <OrderPlanRadar onSearchBid={handleSearchBid} />
         <SummaryPanel response={response} />
       </div>
       <ResultsList response={response} loading={loading && !response} error={error} onOpenDetail={onOpenDetail} />

@@ -132,3 +132,8 @@ export function setCloudSavedItems(items) {
 export function predictReannouncement(keyword) {
   return request(`/radar/reannounce?keyword=${encodeURIComponent(keyword)}`);
 }
+
+// 발주계획 레이더 — 공고 전 신호, 앞으로 6개월 이내 공시된 발주계획에서 키워드 검색
+export function searchOrderPlans(keyword) {
+  return request(`/radar/orderplan?keyword=${encodeURIComponent(keyword)}`);
+}
