@@ -3,6 +3,7 @@ import SearchForm from './SearchForm';
 import ResultsList from '../results/ResultsList';
 import SummaryPanel from '../results/SummaryPanel';
 import { createSearchJob, stepSearchJob, cancelSearchJob } from '../../api/client';
+import { getCachedJob, setCachedJob } from '../../lib/searchCache';
 
 const POLL_INTERVAL_MS = 400;
 
@@ -64,6 +65,7 @@ export default function SearchWorkspace({ onOpenDetail, prefill }) {
         pollRef.current = setTimeout(() => poll(jobId, params), POLL_INTERVAL_MS);
       } else {
         setLoading(false);
+        if (jobData.status === 'done') setCachedJob(params, jobData);
       }
     } catch (e) {
       setError(e.message);
@@ -73,9 +75,20 @@ export default function SearchWorkspace({ onOpenDetail, prefill }) {
 
   async function handleSearch(params) {
     stopPolling();
-    setLoading(true);
     setError(null);
     paramsRef.current = params;
+
+    // 서버 조회에 영향 없는 고급 필터(업체·기관·금액)만 바뀐 재조회는 캐시된 원본으로 즉시 재필터링
+    const cachedJob = getCachedJob(params);
+    if (cachedJob) {
+      currentJobIdRef.current = null;
+      setJob(cachedJob);
+      setResponse(buildResponse(cachedJob, params));
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     try {
       const { jobId } = await createSearchJob(params);
       currentJobIdRef.current = jobId;
