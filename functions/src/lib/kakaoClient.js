@@ -78,11 +78,16 @@ function tokenResponseToRecord(json) {
 }
 
 async function fetchProfile(accessToken) {
-  const res = await fetch(`${API_BASE}/v2/user/me?property_keys=%5B%22kakao_account.profile%22%5D`, {
+  // property_keys 파라미터 없이 호출 — 동의된 항목(kakao_account 등)은 기본으로 전부 내려온다.
+  // 이전에 property_keys=["kakao_account.profile"]로 필터링했었는데, 이건 유효한 리프 키가
+  // 아니라서(정확한 키는 kakao_account.profile.nickname 등 leaf 단위) kakao_account 자체가
+  // 응답에서 통째로 빠지는 원인이었을 가능성이 높다 — 그래서 닉네임이 항상 비어 있었던 것.
+  const res = await fetch(`${API_BASE}/v2/user/me`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.msg || '카카오 프로필 조회 실패');
+  console.log('DEBUG kakao /v2/user/me raw:', JSON.stringify(json));
   return {
     kakaoUserId: String(json.id),
     nickname: json.kakao_account?.profile?.nickname || '카카오 사용자',
