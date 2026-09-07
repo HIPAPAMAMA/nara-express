@@ -33,7 +33,8 @@ async function predictReannouncements(keyword) {
   const from = toDateStr(addDays(lastYearToday, -WINDOW_BEFORE_DAYS));
   const to = toDateStr(addDays(lastYearToday, WINDOW_AFTER_DAYS));
 
-  const result = await search('award', 'all', { from, to });
+  // search()는 'YYYYMMDD'(대시 없음)를 기대한다 — searchJob.js와 동일한 관례
+  const result = await search('award', 'all', { from: from.replaceAll('-', ''), to: to.replaceAll('-', '') });
   const items = dedupe(result.items.map(normalizeItem));
   const matched = items.filter((it) => it.postedAt && matchesKeyword(it, { keyword, keywordType: 'title' }));
 
