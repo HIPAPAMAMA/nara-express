@@ -82,7 +82,10 @@ function AppShell() {
       <header className="border-b border-cream-400 bg-cream-100">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-2.5">
           <img src={logo} alt="NARA express" className="h-14 w-auto" />
-          <span className={`flex items-center gap-1.5 text-xs ${health === 'ok' ? 'text-sage-600' : 'text-amber-600'}`}>
+          <span
+            title="공공데이터포털 나라장터 낙찰정보서비스(getScsbidListSttusServc) 연결 상태"
+            className={`flex items-center gap-1.5 text-xs ${health === 'ok' ? 'text-sage-600' : 'text-amber-600'}`}
+          >
             <span className={`h-1.5 w-1.5 rounded-full ${health === 'ok' ? 'bg-sage-600' : 'bg-amber-600'}`} />
             {health === 'checking' ? 'API 확인 중' : health === 'ok' ? 'API 정상' : 'API 응답 지연'}
           </span>
