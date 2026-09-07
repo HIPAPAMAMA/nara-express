@@ -13,15 +13,17 @@ import MobileMoreSheet from './components/MobileMoreSheet';
 import { checkHealth } from './api/client';
 import { AuthProvider } from './lib/authContext';
 
+// 자주 쓰는 화면(검색·키워드·경쟁사·쇼핑몰·저장내역)을 앞에, 한 번 설정하고 마는 화면
+// (내 업체·알림·설정)과 아직 미구현인 평가분석은 뒤로 — 모바일 더보기 시트 우선순위와 맞춤
 const NAV_TABS = [
   { key: 'search', label: '통합검색' },
-  { key: 'evaluation', label: '평가분석' },
-  { key: 'company', label: '내 업체' },
   { key: 'keyword', label: '관심 키워드' },
   { key: 'competitor', label: '경쟁사' },
   { key: 'mall', label: '쇼핑몰 상품검색' },
   { key: 'saved', label: '저장내역' },
+  { key: 'company', label: '내 업체' },
   { key: 'settings', label: '알림·설정' },
+  { key: 'evaluation', label: '평가분석' },
 ];
 
 // 모바일 하단 탭엔 5자리뿐이라 나머지는 '더보기' 시트로 — 탭 하이라이트도 그쪽으로 맞춘다
