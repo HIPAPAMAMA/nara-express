@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { predictReannouncement } from '../../api/client';
 import { formatAmount, formatRate } from '../../lib/format';
 
+// 작년 공고 제목엔 "2025년"·"하반기" 같은 연도 표기가 박혀 있어서 그대로 검색하면 올해("2026년")
+// 재공고와 절대 안 겹친다 — 연도·반기 표기를 떼어낸 핵심 사업명만 검색어로 써야 매칭된다.
+function toSearchKeyword(title) {
+  return title
+    .replace(/^\[[^\]]*\]\s*/, '')
+    .replace(/^\d{4}년(도)?\s*/, '')
+    .replace(/^(상|하)반기\s*/, '')
+    .replace(/^\d{4}년(도)?\s*/, '')
+    .trim();
+}
+
 // 재공고 레이더 — 작년 이맘때 낙찰된 건을 찾아 올해 재공고 시점을 추정한다(확정 공고 아님).
 // 단가계약성 용역(청소·경비 등)이 1년 주기로 재발주되는 관행을 이용한 참고용 예측.
 export default function ReannounceRadar({ onSearchBid }) {
@@ -74,7 +85,7 @@ export default function ReannounceRadar({ onSearchBid }) {
                     작년 낙찰 {p.lastAwardDate} → 1주년 {p.predictedDate}
                   </div>
                   <button
-                    onClick={() => onSearchBid(p.title)}
+                    onClick={() => onSearchBid(toSearchKeyword(p.title))}
                     className="w-full rounded-md border border-cream-400 py-1 text-[12px] text-ink-600 hover:bg-cream-200"
                   >
                     공고 검색
