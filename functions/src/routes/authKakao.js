@@ -28,7 +28,6 @@ router.get('/kakao/callback', async (req, res) => {
   try {
     const tokens = await kakao.exchangeCodeForToken(code);
     const profile = await kakao.fetchProfile(tokens.accessToken);
-    console.log('DEBUG kakao profile:', JSON.stringify(profile));
     await alertStore.saveUser(profile.kakaoUserId, {
       nickname: profile.nickname,
       accessToken: tokens.accessToken,
@@ -38,8 +37,6 @@ router.get('/kakao/callback', async (req, res) => {
       notifyEnabled: true,
       needsReconnect: false,
     });
-    const stored = await alertStore.getUser(profile.kakaoUserId);
-    console.log('DEBUG stored user after saveUser:', JSON.stringify(stored));
     setSessionCookie(res, profile.kakaoUserId);
     res.setHeader('Set-Cookie', [
       res.getHeader('Set-Cookie'),

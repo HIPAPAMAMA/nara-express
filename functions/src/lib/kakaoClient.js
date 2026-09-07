@@ -88,7 +88,6 @@ async function fetchProfile(accessToken) {
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.msg || '카카오 프로필 조회 실패');
-  console.log('DEBUG kakao /v2/user/me raw:', JSON.stringify(json));
   return {
     kakaoUserId: String(json.id),
     nickname: json.kakao_account?.profile?.nickname || '카카오 사용자',
