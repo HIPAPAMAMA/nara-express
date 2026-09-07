@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../lib/authContext';
-import { fetchAlerts, setNotifyEnabled, disconnectKakao, logoutKakao, toggleTrackedBid } from '../../api/client';
+import { fetchAlerts, setNotifyEnabled, disconnectKakao, logoutKakao, toggleTrackedBid, setCloudKeywords, setCloudSavedItems } from '../../api/client';
 
-// SC-07 알림·설정: SET-001(수신 on/off)·SET-002(낙찰 알림 목록)·SET-004(카카오 연결)
+// 로컬(localStorage)에 쌓이는 데이터 전부 — SET-003 초기화 대상 (새 화면 생기면 여기도 추가할 것)
+const LOCAL_DATA_KEYS = ['myCompany', 'savedItems', 'keywords', 'competitors', 'recentQueries'];
+
+// SC-07 알림·설정: SET-001(수신 on/off)·SET-002(낙찰 알림 목록)·SET-003(데이터 초기화)·SET-004(카카오 연결)
 export default function SettingsWorkspace() {
   const auth = useAuth();
   const [alerts, setAlerts] = useState(null);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -39,6 +43,23 @@ export default function SettingsWorkspace() {
   async function handleRemoveTracked(bidNo) {
     await toggleTrackedBid(bidNo);
     fetchAlerts().then(setAlerts);
+  }
+
+  // SET-003: 로컬 저장분 전체 삭제 — 연결돼 있으면 서버(기기 간 이어보기용) 사본도 같이 비워야
+  // 다음 로그인 시 병합되면서 되살아나지 않는다. 알림 구독(관심 키워드 알림 on/off 등)은 별개라
+  // 여기서 안 건드림 — 그건 "카카오 연결 해제"의 역할.
+  async function handleResetData() {
+    setBusy(true);
+    try {
+      for (const key of LOCAL_DATA_KEYS) localStorage.removeItem(key);
+      if (auth.connected) {
+        await Promise.all([setCloudKeywords([]), setCloudSavedItems([])]);
+      }
+      setConfirmReset(false);
+      window.location.reload();
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (auth.status === 'checking') {
@@ -138,6 +159,30 @@ export default function SettingsWorkspace() {
           )}
         </div>
       )}
+
+      <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
+        <h3 className="mb-1 text-sm font-medium text-ink-800">데이터 초기화</h3>
+        <p className="mb-3 text-xs text-ink-400">
+          내 업체 정보·관심 키워드·경쟁사 목록·저장내역·최근 검색조건을 이 기기에서 전부 지웁니다
+          {auth.connected && ' (카카오로 동기화된 키워드·저장내역도 함께 비워집니다)'}. 카카오 연결 자체는 그대로 유지돼요.
+        </p>
+        {confirmReset ? (
+          <button
+            onClick={handleResetData}
+            disabled={busy}
+            className="w-full rounded-lg border border-amber-600 bg-amber-100 py-2 text-xs font-medium text-amber-800"
+          >
+            정말 초기화할까요? (되돌릴 수 없음)
+          </button>
+        ) : (
+          <button
+            onClick={() => setConfirmReset(true)}
+            className="w-full rounded-lg border border-cream-400 py-2 text-xs text-ink-600"
+          >
+            데이터 초기화
+          </button>
+        )}
+      </div>
     </div>
   );
 }
