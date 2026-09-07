@@ -200,7 +200,8 @@ export default function MallWorkspace() {
                   <div className="text-right">단가</div>
                 </div>
                 {filtered.map((item) => (
-                  <MallResultRow key={item.prdctIdntNo} item={item} />
+                  // 물품식별번호가 서로 다른 계약(업체)에 중복 재사용되는 실데이터 사례가 있어 업체명까지 합쳐 키를 만든다
+                  <MallResultRow key={`${item.prdctIdntNo}-${item.cntrctCorpNm}-${item.cntrctBgnDate}`} item={item} />
                 ))}
               </div>
             )}
