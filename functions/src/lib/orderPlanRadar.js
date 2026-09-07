@@ -75,7 +75,8 @@ async function searchOrderPlans(keyword) {
     }))
     .slice(0, MAX_RESULTS);
 
-  return { keyword, windowFrom: from, windowTo: to, totalMatched: plans.length, plans, errors };
+  const toDash = (s) => `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+  return { keyword, windowFrom: toDash(from), windowTo: toDash(to), totalMatched: plans.length, plans, errors };
 }
 
 module.exports = { searchOrderPlans };
