@@ -5,21 +5,18 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const key = process.env.NARA_SERVICE_KEY;
-  const today = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const d = `${today.getFullYear()}${pad(today.getMonth() + 1)}${pad(today.getDate())}`;
-  const url = new URL('https://apis.data.go.kr/1230000/ao/OrderPlanSttusService/getOrderPlanSttusListThng');
+  const operation = req.query.op || 'getOrderPlanSttusListThng';
+  const url = new URL(`https://apis.data.go.kr/1230000/ao/OrderPlanSttusService/${operation}`);
   url.searchParams.set('serviceKey', key);
   url.searchParams.set('type', 'json');
-  url.searchParams.set('numOfRows', '5');
-  url.searchParams.set('pageNo', '1');
-  url.searchParams.set('inqryDiv', '1');
-  url.searchParams.set('inqryBgnDt', `${d}0000`);
-  url.searchParams.set('inqryEndDt', `${d}2359`);
+  for (const [k, v] of Object.entries(req.query)) {
+    if (k === 'op') continue;
+    url.searchParams.set(k, v);
+  }
   try {
     const r = await fetch(url.toString());
     const text = await r.text();
-    res.json({ status: r.status, body: text.slice(0, 3000) });
+    res.json({ status: r.status, calledUrl: url.toString().replace(key, 'KEY'), body: text.slice(0, 3000) });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
