@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { searchMall } from '../../api/client';
-import { formatAmount, formatDate } from '../../lib/format';
+import { formatAmount } from '../../lib/format';
+import MallResultRow from './MallResultRow';
+import { MALL_DESKTOP_GRID_COLS } from './mallGridTemplate';
 
 const SORT_OPTIONS = [
   { value: 'priceAsc', label: '계약단가 낮은순' },
@@ -140,7 +142,7 @@ export default function MallWorkspace() {
               </div>
             </div>
             <div className="mb-1 font-medium text-ink-600">업체</div>
-            <div className="mb-3 max-h-32 space-y-0.5 overflow-y-auto">
+            <div className="mb-3 max-h-32 space-y-0.5 overflow-y-auto lg:max-h-64">
               <button onClick={() => setCorpFilter(null)} className={`block w-full text-left ${!corpFilter ? 'text-clay-600 font-medium' : 'text-ink-400'}`}>
                 전체 {corpCounts.length}곳
               </button>
@@ -189,37 +191,16 @@ export default function MallWorkspace() {
             {filtered.length === 0 ? (
               <div className="rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">조건에 맞는 상품이 없습니다.</div>
             ) : (
-              <div className="space-y-2">
+              <div className="overflow-x-auto rounded-xl border border-cream-400 bg-cream-50">
+                <div className={`hidden ${MALL_DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[11px] font-medium text-ink-400 lg:grid`}>
+                  <div>품명·규격</div>
+                  <div>제조사</div>
+                  <div>원산지</div>
+                  <div className="text-right">계약기간</div>
+                  <div className="text-right">단가</div>
+                </div>
                 {filtered.map((item) => (
-                  <div key={item.prdctIdntNo} className="rounded-lg border border-cream-400 bg-cream-50 p-3 text-xs">
-                    <div className="mb-1 flex items-center gap-1.5">
-                      <span className="rounded bg-sage-100 px-1.5 py-0.5 text-[10px] font-medium text-sage-600">{item.entrprsDivNm}</span>
-                      <span className="text-ink-800">{item.prdctSpecNm}</span>
-                    </div>
-                    <div className="mb-1 flex flex-wrap gap-x-3 text-ink-400">
-                      <span>물품식별번호 {item.prdctIdntNo}</span>
-                      <span>제조사 {item.cntrctCorpNm}</span>
-                      <span>원산지 {item.prdctOrgplceNm}</span>
-                      <span>공급지역 {item.splyJrsdctRgnNm}</span>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-ink-400">
-                        계약 {formatDate(item.cntrctBgnDate)} ~ {formatDate(item.cntrctEndDate)} · 납품기한 {item.dlvrTmlmtDaynum}일
-                      </div>
-                      <div className="tabular-nums font-medium text-ink-800">
-                        {item.cntrctPrceAmt?.toLocaleString()}원 / {item.prdctUnit}
-                      </div>
-                    </div>
-                    {item.certList.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {item.certList.map((c) => (
-                          <span key={c} className="rounded bg-cream-200 px-1.5 py-0.5 text-[10px] text-ink-400">
-                            {c}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <MallResultRow key={item.prdctIdntNo} item={item} />
                 ))}
               </div>
             )}

@@ -65,7 +65,13 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
     );
   }
 
-  if (!response) return null;
+  if (!response) {
+    return (
+      <div className="rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">
+        조회 조건을 설정하고 조회하기를 눌러주세요.
+      </div>
+    );
+  }
 
   if (items.length === 0 && response.jobStatus !== 'running') {
     // RES-024
@@ -112,7 +118,8 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
         </div>
       )}
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      {/* 데스크톱 툴바 — 한 줄에 다 들어갈 폭이 있을 때 */}
+      <div className="mb-3 hidden items-center gap-2 md:flex">
         <div className="flex flex-wrap gap-1">
           {TYPE_FILTERS.map((t) => (
             <button
@@ -130,7 +137,7 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
           value={textFilter}
           onChange={(e) => setTextFilter(e.target.value)}
           placeholder="결과 내 검색"
-          className="ml-auto rounded-md border border-cream-400 px-2 py-1 text-xs"
+          className="ml-auto w-48 rounded-md border border-cream-400 px-2 py-1 text-xs"
         />
         <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-md border border-cream-400 px-2 py-1 text-xs">
           {SORT_OPTIONS.map((o) => (
@@ -150,15 +157,58 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
         </button>
       </div>
 
-      {/* 7.4절: 좁은 창에서는 표 영역만 가로 스크롤 허용 (필터·네비는 고정) */}
+      {/* 모바일 툴바 — 한 줄에 다 못 들어가서 역할별로 줄바꿈 */}
+      <div className="mb-3 flex flex-col gap-2 md:hidden">
+        <div className="flex flex-wrap gap-1">
+          {TYPE_FILTERS.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTypeFilter(t)}
+              className={`rounded-md px-2.5 py-1 text-xs ${
+                typeFilter === t ? 'bg-clay-100 text-clay-600 font-medium' : 'border border-cream-400 text-ink-600'
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            value={textFilter}
+            onChange={(e) => setTextFilter(e.target.value)}
+            placeholder="결과 내 검색"
+            className="flex-1 rounded-md border border-cream-400 px-2 py-1 text-xs"
+          />
+          <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-md border border-cream-400 px-2 py-1 text-xs">
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => setDense((v) => !v)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[11px] text-ink-600">
+            {dense ? '상세 보기' : '간단 보기'}
+          </button>
+          <button onClick={() => exportCsv(filtered)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[11px] text-ink-600">
+            CSV
+          </button>
+          <button onClick={() => exportExcel(filtered)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[11px] text-ink-600">
+            Excel
+          </button>
+        </div>
+      </div>
+
+      {/* 7.4절: 좁은 창에서는 표 영역만 가로 스크롤 허용 (필터·네비는 고정) — 720px 최소폭은 데스크톱 표 전용, 모바일 카드엔 강제하지 않는다 */}
       <div className="overflow-x-auto rounded-xl border border-cream-400 bg-cream-50">
-        <div className={`hidden min-w-[720px] lg:grid ${DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[11px] font-medium text-ink-400`}>
+        <div className={`hidden lg:grid lg:min-w-[720px] ${DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[11px] font-medium text-ink-400`}>
           <div>공고·사업명</div>
           <div>업체·기관</div>
           <div className="text-right">금액·일정</div>
           <div className="text-right">핵심지표</div>
         </div>
-        <div className="min-w-[720px] lg:min-w-0">
+        <div className="lg:min-w-[720px]">
           {visible.map((item) => (
             <ResultRow key={item.id} item={item} dense={dense} onOpenDetail={onOpenDetail} onCopyBidNo={copyBidNo} />
           ))}

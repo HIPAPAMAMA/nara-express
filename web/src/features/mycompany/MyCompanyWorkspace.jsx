@@ -86,7 +86,7 @@ export default function MyCompanyWorkspace() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl lg:max-w-4xl">
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-5">
         <h2 className="mb-1 text-base font-medium text-ink-800">내 업체</h2>
         <p className="mb-4 text-xs text-ink-400">등록한 업체정보로 공고 적합도를 판정합니다. 고치면 자동으로 저장됩니다.</p>
@@ -109,6 +109,8 @@ export default function MyCompanyWorkspace() {
         </div>
         {autoFillError && <p className="mb-4 text-xs text-amber-800">{autoFillError}</p>}
 
+        <div className="grid grid-cols-1 gap-x-6 lg:grid-cols-2">
+        <div>
         {/* MYC-006 완성도 */}
         <div className="mb-4">
           <div className="mb-1 flex justify-between text-xs text-ink-400">
@@ -171,7 +173,9 @@ export default function MyCompanyWorkspace() {
             />
           </label>
         </div>
+        </div>
 
+        <div>
         {/* MYC-003 보유자격 */}
         <div className="mb-4">
           <div className="mb-1 text-xs font-medium text-ink-600">보유자격</div>
@@ -250,6 +254,8 @@ export default function MyCompanyWorkspace() {
               </button>
             ))}
           </div>
+        </div>
+        </div>
         </div>
       </div>
 

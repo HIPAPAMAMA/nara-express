@@ -264,16 +264,37 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
         ) : (
           <div className="space-y-1">
             {competitors.map((c) => (
-              <div key={c.bizNo} className="flex items-center gap-2 border-b border-cream-400 py-1.5 text-sm last:border-b-0">
-                <input type="checkbox" checked={selected.has(c.bizNo)} onChange={() => toggleSelect(c.bizNo)} />
-                <span className="flex-1 text-ink-800">{c.name}</span>
-                <span className="text-xs text-ink-400">{c.bizNo}</span>
-                <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-clay-600">
-                  분석
-                </button>
-                <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-ink-400">
-                  삭제
-                </button>
+              <div key={c.bizNo} className="border-b border-cream-400 py-1.5 text-sm last:border-b-0">
+                {/* 데스크톱: 한 줄 */}
+                <div className="hidden items-center gap-2 sm:flex">
+                  <input type="checkbox" checked={selected.has(c.bizNo)} onChange={() => toggleSelect(c.bizNo)} />
+                  <span className="flex-1 text-ink-800">{c.name}</span>
+                  <span className="text-xs text-ink-400">{c.bizNo}</span>
+                  <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-clay-600">
+                    분석
+                  </button>
+                  <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-ink-400">
+                    삭제
+                  </button>
+                </div>
+                {/* 모바일: 이름/사업자번호/버튼 줄바꿈 */}
+                <div className="flex flex-col gap-1 sm:hidden">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" checked={selected.has(c.bizNo)} onChange={() => toggleSelect(c.bizNo)} />
+                    <span className="flex-1 text-ink-800">{c.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between pl-6">
+                    <span className="text-xs text-ink-400">{c.bizNo}</span>
+                    <div className="flex gap-2">
+                      <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-clay-600">
+                        분석
+                      </button>
+                      <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-ink-400">
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

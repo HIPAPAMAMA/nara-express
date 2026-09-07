@@ -202,7 +202,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
           상세조건 {showAdvanced ? '접기' : '펼치기'}
         </button>
         {showAdvanced && (
-          <div className="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-cream-50 p-3">
+          <div className="mt-2 grid grid-cols-1 gap-2 rounded-lg bg-cream-50 p-3 sm:grid-cols-2">
             <input
               value={orderOrg}
               onChange={(e) => setOrderOrg(e.target.value)}

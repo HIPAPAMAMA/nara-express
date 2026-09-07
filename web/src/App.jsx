@@ -8,6 +8,7 @@ import MallWorkspace from './features/mall/MallWorkspace';
 import KeywordWorkspace from './features/keyword/KeywordWorkspace';
 import SavedWorkspace from './features/saved/SavedWorkspace';
 import MobileBottomNav from './components/MobileBottomNav';
+import MobileMoreSheet from './components/MobileMoreSheet';
 import { checkHealth } from './api/client';
 
 const NAV_TABS = [
@@ -21,7 +22,17 @@ const NAV_TABS = [
   { key: 'settings', label: '알림·설정' },
 ];
 
-const MOBILE_KEY_MAP = { search: 'search', competitor: 'competitor', keyword: 'keyword', saved: 'saved', settings: 'settings' };
+// 모바일 하단 탭엔 5자리뿐이라 나머지는 '더보기' 시트로 — 탭 하이라이트도 그쪽으로 맞춘다
+const MOBILE_KEY_MAP = {
+  search: 'search',
+  competitor: 'competitor',
+  keyword: 'keyword',
+  saved: 'saved',
+  company: 'more',
+  mall: 'more',
+  settings: 'more',
+  evaluation: 'more',
+};
 
 function Placeholder({ label }) {
   return (
@@ -36,6 +47,12 @@ export default function App() {
   const [view, setView] = useState('search');
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchPrefill, setSearchPrefill] = useState(null); // KWD-002: 키워드 클릭 → 검색 실행
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  function handleMobileNavSelect(key) {
+    if (key === 'more') setMoreOpen(true);
+    else setView(key);
+  }
 
   function handleSearchKeyword(keyword) {
     setSearchPrefill({ keyword, requestedAt: Date.now() });
@@ -86,7 +103,8 @@ export default function App() {
 
       {selectedItem && <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} />}
 
-      <MobileBottomNav active={MOBILE_KEY_MAP[view] || 'search'} onSelect={setView} />
+      <MobileBottomNav active={MOBILE_KEY_MAP[view] || 'search'} onSelect={handleMobileNavSelect} />
+      <MobileMoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} onSelect={setView} />
     </div>
   );
 }

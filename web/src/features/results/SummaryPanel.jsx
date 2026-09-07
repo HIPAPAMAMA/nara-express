@@ -10,7 +10,13 @@ function loadSavedCount() {
 
 // RES-021: 사이드 요약 패널 — 검색건수 / 조회유형 / 조회기간 / 저장항목 수
 export default function SummaryPanel({ response }) {
-  if (!response) return null;
+  if (!response) {
+    return (
+      <div className="rounded-xl border border-cream-400 bg-cream-100 p-4 text-xs text-ink-400">
+        조회 후 요약 정보가 여기에 표시됩니다.
+      </div>
+    );
+  }
   const kind = response.items[0]?.kind;
 
   return (
