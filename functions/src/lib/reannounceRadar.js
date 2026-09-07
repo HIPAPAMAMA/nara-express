@@ -4,6 +4,7 @@
 const { search } = require('./naraClient');
 const { normalizeItem, dedupe } = require('./normalize');
 const { matchesKeyword } = require('./searchJob');
+const { computeChunks } = require('./chunk');
 
 const WINDOW_BEFORE_DAYS = 7;
 const WINDOW_AFTER_DAYS = 90;
@@ -33,9 +34,26 @@ async function predictReannouncements(keyword) {
   const from = toDateStr(addDays(lastYearToday, -WINDOW_BEFORE_DAYS));
   const to = toDateStr(addDays(lastYearToday, WINDOW_AFTER_DAYS));
 
-  // search()는 'YYYYMMDD'(대시 없음)를 기대한다 — searchJob.js와 동일한 관례
-  const result = await search('award', 'all', { from: from.replaceAll('-', ''), to: to.replaceAll('-', '') });
-  const items = dedupe(result.items.map(normalizeItem));
+  // 나라장터 API는 한 호출당 "시작일+1개월(달력)" 이상 범위를 못 받는다(2단계 청크 엔진과 동일 제약,
+  // chunk.js 참고) — 최대 97일짜리 창을 그대로 넘기면 "입력범위값 초과 에러"가 남. 월 단위로 쪼개서
+  // 병렬 호출한 뒤 합친다.
+  const chunks = computeChunks(from, to);
+  const chunkResults = await Promise.allSettled(
+    chunks.map((c) => search('award', 'all', { from: c.from.replaceAll('-', ''), to: c.to.replaceAll('-', '') }))
+  );
+
+  const rawItems = [];
+  const errors = [];
+  for (const r of chunkResults) {
+    if (r.status === 'fulfilled') {
+      rawItems.push(...r.value.items);
+      errors.push(...r.value.errors);
+    } else {
+      errors.push({ message: r.reason?.message });
+    }
+  }
+
+  const items = dedupe(rawItems.map(normalizeItem));
   const matched = items.filter((it) => it.postedAt && matchesKeyword(it, { keyword, keywordType: 'title' }));
 
   const predictions = matched
@@ -65,7 +83,7 @@ async function predictReannouncements(keyword) {
     windowTo: to,
     totalMatched: matched.length,
     predictions,
-    errors: result.errors,
+    errors,
   };
 }
 
