@@ -129,20 +129,21 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
         ))}
       </div>
 
-      {/* SRC-002 */}
-      <div className="mb-4 flex gap-2">
-        <div className="flex shrink-0 rounded-lg border border-cream-400 overflow-hidden">
+      {/* SRC-002 — 검색창이 이 폼에서 제일 중요해서 가장 크게. 이 폼은 항상 360px 고정 사이드바
+          안에서만 쓰여서(모바일이든 PC든 폭이 넓어질 일이 없음) 뷰포트 기준 반응형 대신 항상 세로로 쌓는다 */}
+      <div className="mb-4 flex flex-col gap-2">
+        <div className="flex rounded-lg border border-cream-400 overflow-hidden">
           <button
             type="button"
             onClick={() => setKeywordType('title')}
-            className={`whitespace-nowrap px-3 py-2 text-xs ${keywordType === 'title' ? 'bg-clay-100 text-clay-600' : 'text-ink-400'}`}
+            className={`flex-1 whitespace-nowrap px-3 py-2 text-xs ${keywordType === 'title' ? 'bg-clay-100 text-clay-600' : 'text-ink-400'}`}
           >
             사업명·공고번호
           </button>
           <button
             type="button"
             onClick={() => setKeywordType('company')}
-            className={`whitespace-nowrap px-3 py-2 text-xs ${keywordType === 'company' ? 'bg-clay-100 text-clay-600' : 'text-ink-400'}`}
+            className={`flex-1 whitespace-nowrap px-3 py-2 text-xs ${keywordType === 'company' ? 'bg-clay-100 text-clay-600' : 'text-ink-400'}`}
           >
             업체명
           </button>
@@ -151,7 +152,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder={keywordType === 'title' ? '사업명 또는 공고번호 검색' : '업체명 검색'}
-          className="min-w-0 flex-1 rounded-lg border border-cream-400 px-3 py-2 text-sm outline-none focus:border-clay-400"
+          className="min-w-0 flex-1 rounded-lg border border-cream-400 px-4 py-3 text-lg outline-none focus:border-clay-400"
         />
       </div>
 
