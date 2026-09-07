@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../lib/authContext';
 import { fetchAlerts, setNotifyEnabled, disconnectKakao, logoutKakao, toggleTrackedBid, setCloudKeywords, setCloudSavedItems } from '../../api/client';
 
@@ -12,6 +12,8 @@ export default function SettingsWorkspace() {
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [importMessage, setImportMessage] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (auth.connected) fetchAlerts().then(setAlerts).catch(() => setAlerts(null));
@@ -60,6 +62,53 @@ export default function SettingsWorkspace() {
     } finally {
       setBusy(false);
     }
+  }
+
+  // 데이터 백업: 카카오 로그인 없이도 기기를 옮길 수 있게 로컬 데이터를 파일로 내보내고 불러온다
+  function handleExport() {
+    const data = {};
+    for (const key of LOCAL_DATA_KEYS) {
+      const raw = localStorage.getItem(key);
+      if (raw != null) data[key] = JSON.parse(raw);
+    }
+    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), data }, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nara-express-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImportFile(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setImportMessage(null);
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const data = parsed.data || parsed; // 하위호환: data로 안 감싸진 파일도 허용
+        let restored = 0;
+        for (const key of LOCAL_DATA_KEYS) {
+          if (data[key] !== undefined) {
+            localStorage.setItem(key, JSON.stringify(data[key]));
+            restored += 1;
+          }
+        }
+        if (restored === 0) {
+          setImportMessage({ type: 'error', text: '이 파일에서 복원할 데이터를 찾지 못했어요.' });
+          return;
+        }
+        window.location.reload();
+      } catch {
+        setImportMessage({ type: 'error', text: '올바른 백업 파일이 아니에요.' });
+      }
+    };
+    reader.readAsText(file);
   }
 
   if (auth.status === 'checking') {
@@ -159,6 +208,26 @@ export default function SettingsWorkspace() {
           )}
         </div>
       )}
+
+      <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
+        <h3 className="mb-1 text-sm font-medium text-ink-800">데이터 백업</h3>
+        <p className="mb-3 text-xs text-ink-400">
+          내 업체·관심 키워드·경쟁사·저장내역·최근 검색조건을 파일로 내보내거나 불러옵니다. 카카오 로그인 없이 기기를 옮길 때 씁니다.
+        </p>
+        <div className="flex gap-2">
+          <button onClick={handleExport} className="flex-1 rounded-lg border border-cream-400 py-2 text-xs text-ink-600">
+            내보내기
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex-1 rounded-lg border border-cream-400 py-2 text-xs text-ink-600"
+          >
+            가져오기
+          </button>
+          <input ref={fileInputRef} type="file" accept="application/json" onChange={handleImportFile} className="hidden" />
+        </div>
+        {importMessage && <p className="mt-2 text-[12px] text-amber-800">{importMessage.text}</p>}
+      </div>
 
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
         <h3 className="mb-1 text-sm font-medium text-ink-800">데이터 초기화</h3>
