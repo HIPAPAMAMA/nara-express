@@ -78,7 +78,7 @@ function extractHwpxText(buffer) {
 async function extractHwpText(buffer) {
   const convertUrl = process.env.CLOUD_RUN_HWP_CONVERT_URL;
   if (!convertUrl) {
-    const err = new Error('HWP 변환기(Cloud Run)가 설정되지 않았습니다.');
+    const err = new Error('구형 HWP 파일은 지원하지 않습니다.');
     err.unsupported = true;
     throw err;
   }
@@ -103,9 +103,9 @@ async function extractAttachmentText({ name, url }) {
     if (ext === 'pdf') return { text: await extractPdfText(buffer) };
     if (ext === 'hwpx') return { text: extractHwpxText(buffer) };
     if (ext === 'hwp') return { text: await extractHwpText(buffer) };
-    return { error: `지원하지 않는 파일 형식(.${ext || '?'})` };
+    return { error: `지원하지 않는 파일 형식(.${ext || '?'})`, unsupported: true };
   } catch (e) {
-    return { error: e.message };
+    return { error: e.message, unsupported: Boolean(e.unsupported) };
   }
 }
 

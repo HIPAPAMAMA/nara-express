@@ -63,7 +63,7 @@ async function checkRestriction(attachments) {
   for (const att of targets) {
     const result = await extractAttachmentText(att);
     if (result.error) {
-      filesFailed.push({ name: att.name, reason: result.error });
+      filesFailed.push({ name: att.name, reason: result.error, unsupported: Boolean(result.unsupported) });
       continue;
     }
     filesChecked.push(att.name);
@@ -81,11 +81,16 @@ async function checkRestriction(attachments) {
   }
 
   if (filesFailed.length > 0) {
+    // 구형 HWP만 읽지 못한 경우(가장 흔한 케이스)는 "시스템 오류"가 아니라 "지원 범위 밖"임을 명확히 안내
+    const allUnsupported = filesFailed.every((f) => f.unsupported);
+    const note = allUnsupported
+      ? '구형 HWP 파일은 자동 판정을 지원하지 않습니다(PDF·최신 HWPX는 지원). 원문에서 직접 확인해주세요.'
+      : `${filesFailed.length}개 파일을 읽지 못했습니다. 원문에서 직접 확인하세요.`;
     return {
       status: 'needs_review',
       matchedFile: null,
       excerpt: null,
-      note: `${filesFailed.length}개 파일을 읽지 못했습니다. 원문에서 직접 확인하세요.`,
+      note,
       checkedAt,
       filesChecked,
       filesFailed,
