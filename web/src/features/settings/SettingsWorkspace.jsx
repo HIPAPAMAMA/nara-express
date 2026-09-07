@@ -4,7 +4,7 @@ import { fetchAlerts, setNotifyEnabled, disconnectKakao, logoutKakao, toggleTrac
 import { isInstallAvailable, isIos, isStandalone, onInstallAvailabilityChange, promptInstall } from '../../lib/pwaInstall';
 
 // 로컬(localStorage)에 쌓이는 데이터 전부 — SET-003 초기화 대상 (새 화면 생기면 여기도 추가할 것)
-const LOCAL_DATA_KEYS = ['myCompany', 'savedItems', 'keywords', 'competitors', 'recentQueries'];
+const LOCAL_DATA_KEYS = ['myCompany', 'savedItems', 'keywords', 'competitors'];
 
 // SC-07 알림·설정: SET-001(수신 on/off)·SET-002(낙찰 알림 목록)·SET-003(데이터 초기화)·SET-004(카카오 연결)
 export default function SettingsWorkspace() {
@@ -241,7 +241,7 @@ export default function SettingsWorkspace() {
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
         <h3 className="mb-1 text-sm font-medium text-ink-800">데이터 백업</h3>
         <p className="mb-3 text-xs text-ink-400">
-          내 업체·관심 키워드·경쟁사·저장내역·최근 검색조건을 파일로 내보내거나 불러옵니다. 카카오 로그인 없이 기기를 옮길 때 씁니다.
+          내 업체·관심 키워드·경쟁사·저장내역을 파일로 내보내거나 불러옵니다. 카카오 로그인 없이 기기를 옮길 때 씁니다.
         </p>
         <div className="flex gap-2">
           <button onClick={handleExport} className="flex-1 rounded-lg border border-cream-400 py-2 text-xs text-ink-600">
@@ -261,7 +261,7 @@ export default function SettingsWorkspace() {
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
         <h3 className="mb-1 text-sm font-medium text-ink-800">데이터 초기화</h3>
         <p className="mb-3 text-xs text-ink-400">
-          내 업체 정보·관심 키워드·경쟁사 목록·저장내역·최근 검색조건을 이 기기에서 전부 지웁니다
+          내 업체 정보·관심 키워드·경쟁사 목록·저장내역을 이 기기에서 전부 지웁니다
           {auth.connected && ' (카카오로 동기화된 키워드·저장내역도 함께 비워집니다)'}. 카카오 연결 자체는 그대로 유지돼요.
         </p>
         {confirmReset ? (

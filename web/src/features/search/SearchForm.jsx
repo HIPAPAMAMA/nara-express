@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const DATA_TYPES = [
   { value: 'award', label: '낙찰결과' },
@@ -8,39 +8,21 @@ const DATA_TYPES = [
 
 const BIZ_TYPES = ['전체', '용역', '물품', '공사', '외자'];
 
-// SRC-004: 기간 프리셋 9종
+// SRC-004: 기간 프리셋 — 9개월·2년·4년은 실사용 빈도가 낮다는 피드백으로 6종으로 축소
 const PRESETS = [
   { label: '1개월', months: 1 },
   { label: '3개월', months: 3 },
   { label: '6개월', months: 6 },
-  { label: '9개월', months: 9 },
   { label: '1년', months: 12 },
-  { label: '2년', months: 24 },
   { label: '3년', months: 36 },
-  { label: '4년', months: 48 },
   { label: '5년', months: 60 },
 ];
-
-const RECENT_KEY = 'recentQueries';
 
 function pad(n) {
   return String(n).padStart(2, '0');
 }
 function toDateStr(d) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-function loadRecent() {
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
-function saveRecent(entry) {
-  const list = loadRecent().filter((q) => JSON.stringify(q) !== JSON.stringify(entry));
-  list.unshift(entry);
-  localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 12))); // SRC-008: 최대 12개
 }
 
 export default function SearchForm({ onSearch, loading, onCancel, initialKeyword }) {
@@ -51,17 +33,12 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
   const [from, setFrom] = useState(toDateStr(new Date(Date.now() - 30 * 86400000)));
   const [to, setTo] = useState(today);
   const [bizType, setBizType] = useState('전체'); // SRC-011
-  const [recent, setRecent] = useState([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [orderOrg, setOrderOrg] = useState(''); // SRC-013
   const [demandOrg, setDemandOrg] = useState(''); // SRC-014
   const [priceMin, setPriceMin] = useState(''); // SRC-017
   const [priceMax, setPriceMax] = useState('');
   const [mode, setMode] = useState('quick'); // SRC-005: 빠른조회/정밀조회
-
-  useEffect(() => {
-    setRecent(loadRecent());
-  }, []);
 
   function applyPreset(months) {
     const end = new Date();
@@ -89,24 +66,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
 
   function handleSubmit(e) {
     e.preventDefault();
-    const params = buildParams();
-    saveRecent(params);
-    setRecent(loadRecent());
-    onSearch(params);
-  }
-
-  function restoreQuery(q) {
-    setDataType(q.kind);
-    setFrom(q.from);
-    setTo(q.to);
-    setBizType(q.bizType);
-    setKeywordType(q.keywordType);
-    setKeyword(q.keyword || '');
-    setOrderOrg(q.orderOrg || '');
-    setDemandOrg(q.demandOrg || '');
-    setPriceMin(q.priceMin ?? '');
-    setPriceMax(q.priceMax ?? '');
-    onSearch(q);
+    onSearch(buildParams());
   }
 
   return (
@@ -269,22 +229,6 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
         <button type="submit" className="w-full rounded-lg bg-clay-400 py-2.5 text-sm font-medium text-white">
           조회하기
         </button>
-      )}
-
-      {/* SRC-008 */}
-      {recent.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {recent.map((q, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => restoreQuery(q)}
-              className="rounded-full border border-cream-400 px-2.5 py-1 text-[12px] text-ink-400 hover:bg-cream-200"
-            >
-              {q.keyword || `${q.kind}·${q.from}~${q.to}`}
-            </button>
-          ))}
-        </div>
       )}
     </form>
   );

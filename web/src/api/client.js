@@ -127,3 +127,8 @@ export function setCloudSavedItems(items) {
     body: JSON.stringify({ items }),
   });
 }
+
+// 재공고 레이더 — 작년 이맘때 낙찰 이력 기준 올해 재공고 예측(추정치)
+export function predictReannouncement(keyword) {
+  return request(`/radar/reannounce?keyword=${encodeURIComponent(keyword)}`);
+}

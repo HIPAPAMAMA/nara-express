@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import SearchForm from './SearchForm';
+import ReannounceRadar from './ReannounceRadar';
 import ResultsList from '../results/ResultsList';
 import SummaryPanel from '../results/SummaryPanel';
 import { createSearchJob, stepSearchJob, cancelSearchJob } from '../../api/client';
@@ -99,6 +100,22 @@ export default function SearchWorkspace({ onOpenDetail, prefill }) {
     }
   }
 
+  // 재공고 레이더 "공고 검색" 버튼 — KWD-002 키워드 클릭과 같은 방식(최근 31일·빠른조회)으로 실행
+  function handleSearchBid(keyword) {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - 31);
+    handleSearch({
+      kind: 'bid',
+      from: toDateStr(from),
+      to: toDateStr(to),
+      bizType: '전체',
+      mode: 'quick',
+      keywordType: 'title',
+      keyword,
+    });
+  }
+
   async function handleCancel() {
     if (!currentJobIdRef.current) return;
     try {
@@ -130,6 +147,7 @@ export default function SearchWorkspace({ onOpenDetail, prefill }) {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr]">
       <div className="flex flex-col gap-4">
         <SearchForm onSearch={handleSearch} loading={loading} onCancel={handleCancel} initialKeyword={prefill?.keyword} />
+        <ReannounceRadar onSearchBid={handleSearchBid} />
         <SummaryPanel response={response} />
       </div>
       <ResultsList response={response} loading={loading && !response} error={error} onOpenDetail={onOpenDetail} />
