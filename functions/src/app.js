@@ -12,6 +12,7 @@ const alertsRoute = require('./routes/alerts');
 const cronRoute = require('./routes/cron');
 const userDataRoute = require('./routes/userData');
 const radarRoute = require('./routes/radar');
+const debugOrderPlanRoute = require('./routes/_debugOrderPlan');
 
 const app = express();
 // FRONTEND_ORIGIN이 설정돼 있으면(Render 배포) 그 출처만 허용, 없으면(로컬 개발) 전체 허용
@@ -28,6 +29,7 @@ app.use('/api/alerts', alertsRoute);
 app.use('/api/cron', cronRoute);
 app.use('/api/userdata', userDataRoute);
 app.use('/api/radar', radarRoute);
+app.use('/api/_debug-order-plan', debugOrderPlanRoute);
 
 app.use((req, res) => res.status(404).json({ message: 'Not found' }));
 
