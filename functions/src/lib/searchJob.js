@@ -66,4 +66,4 @@ async function stepJob(jobId) {
   return saveJob(job);
 }
 
-module.exports = { stepJob };
+module.exports = { stepJob, matchesKeyword };

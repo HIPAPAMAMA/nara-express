@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatAmount, formatDateTime } from '../../lib/format';
-import { checkRestriction } from '../../api/client';
+import { checkRestriction, fetchAlerts, toggleTrackedBid } from '../../api/client';
 import { assessEligibility } from '../../lib/eligibility';
+import { useAuth } from '../../lib/authContext';
 
 const STATUS_LABEL = {
   restricted: { label: '제한있음', tone: 'bg-amber-100 text-amber-800' },
@@ -18,9 +19,31 @@ const FIT_LABEL = {
 
 // 데스크톱 중앙 모달/모바일 바텀시트가 공유하는 내용 — 껍데기만 다르고 내용은 하나
 function DetailPanelBody({ item, onClose }) {
+  const auth = useAuth();
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState(null);
+  const [tracked, setTracked] = useState(false);
+  const [needLoginNotice, setNeedLoginNotice] = useState(false);
   const fitness = useMemo(() => assessEligibility(item, result), [item, result]);
+
+  useEffect(() => {
+    if (item.kind === 'bid' && auth.connected) {
+      fetchAlerts()
+        .then((res) => setTracked(res.trackedBids.includes(item.bidNo)))
+        .catch(() => setTracked(false));
+    } else {
+      setTracked(false);
+    }
+  }, [item.kind, item.bidNo, auth.connected]);
+
+  async function toggleBidAlert() {
+    if (!auth.connected) {
+      setNeedLoginNotice(true);
+      return;
+    }
+    const { on } = await toggleTrackedBid(item.bidNo);
+    setTracked(on);
+  }
 
   async function runCheck() {
     setChecking(true);
@@ -139,7 +162,21 @@ function DetailPanelBody({ item, onClose }) {
         <span className="rounded-md border border-cream-400 px-2.5 py-1.5 text-ink-300" title="3단계 예정">
           제안·규격서 저장
         </span>
+        {/* RES-018: 이 공고가 낙찰 결과를 발표하면 카카오톡으로 알림 — 입찰공고에만 의미 있음 */}
+        {item.kind === 'bid' && (
+          <button
+            onClick={toggleBidAlert}
+            className={`rounded-md px-2.5 py-1.5 ${
+              tracked ? 'bg-amber-100 text-amber-800' : 'border border-cream-400 text-ink-600'
+            }`}
+          >
+            {tracked ? '🔔 낙찰 알림 등록됨' : '낙찰 알림 등록'}
+          </button>
+        )}
       </div>
+      {needLoginNotice && (
+        <p className="mt-2 text-[12px] text-amber-800">알림을 받으려면 카카오 연결이 필요해요. "알림·설정" 화면에서 연결할 수 있습니다.</p>
+      )}
     </>
   );
 }

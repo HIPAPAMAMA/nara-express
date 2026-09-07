@@ -7,6 +7,9 @@ const searchRoute = require('./routes/search');
 const restrictionCheckRoute = require('./routes/restrictionCheck');
 const companyRoute = require('./routes/company');
 const mallRoute = require('./routes/mall');
+const authKakaoRoute = require('./routes/authKakao');
+const alertsRoute = require('./routes/alerts');
+const cronRoute = require('./routes/cron');
 
 const app = express();
 // FRONTEND_ORIGIN이 설정돼 있으면(Render 배포) 그 출처만 허용, 없으면(로컬 개발) 전체 허용
@@ -18,6 +21,9 @@ app.use('/api/search', searchRoute);
 app.use('/api/restriction-check', restrictionCheckRoute);
 app.use('/api/company', companyRoute);
 app.use('/api/mall', mallRoute);
+app.use('/api/auth', authKakaoRoute);
+app.use('/api/alerts', alertsRoute);
+app.use('/api/cron', cronRoute);
 
 app.use((req, res) => res.status(404).json({ message: 'Not found' }));
 

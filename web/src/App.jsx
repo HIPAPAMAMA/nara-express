@@ -7,9 +7,11 @@ import MyCompanyWorkspace from './features/mycompany/MyCompanyWorkspace';
 import MallWorkspace from './features/mall/MallWorkspace';
 import KeywordWorkspace from './features/keyword/KeywordWorkspace';
 import SavedWorkspace from './features/saved/SavedWorkspace';
+import SettingsWorkspace from './features/settings/SettingsWorkspace';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileMoreSheet from './components/MobileMoreSheet';
 import { checkHealth } from './api/client';
+import { AuthProvider } from './lib/authContext';
 
 const NAV_TABS = [
   { key: 'search', label: '통합검색' },
@@ -43,6 +45,14 @@ function Placeholder({ label }) {
 }
 
 export default function App() {
+  return (
+    <AuthProvider>
+      <AppShell />
+    </AuthProvider>
+  );
+}
+
+function AppShell() {
   const [health, setHealth] = useState('checking');
   const [view, setView] = useState('search');
   const [selectedItem, setSelectedItem] = useState(null);
@@ -98,7 +108,7 @@ export default function App() {
         {view === 'keyword' && <KeywordWorkspace onSearchKeyword={handleSearchKeyword} />}
         {view === 'saved' && <SavedWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'evaluation' && <Placeholder label="평가분석 (5단계, 보류)" />}
-        {view === 'settings' && <Placeholder label="알림·설정" />}
+        {view === 'settings' && <SettingsWorkspace />}
       </main>
 
       {selectedItem && <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} />}

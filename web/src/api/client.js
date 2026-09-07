@@ -68,3 +68,40 @@ export function searchMall({ searchType, keyword, contractType, numOfRows, pageN
   if (keyword) params.set('keyword', keyword);
   return request(`/mall/search?${params.toString()}`);
 }
+
+// SET-004: 카카오 로그인 상태 확인 — 로그인 자체는 OAuth라 SPA 밖으로 이동해야 하므로
+// fetch가 아니라 App.jsx에서 <a href="/api/auth/kakao/login">으로 직접 이동시킨다.
+export function getMe() {
+  return request('/auth/me');
+}
+
+export function logoutKakao() {
+  return request('/auth/logout', { method: 'POST' });
+}
+
+// KWD-003·RES-018: 내 알림 구독 현황
+export function fetchAlerts() {
+  return request('/alerts');
+}
+
+export function toggleKeywordAlert(keyword) {
+  return request(`/alerts/keywords/${encodeURIComponent(keyword)}/toggle`, { method: 'POST' });
+}
+
+export function toggleTrackedBid(bidNo) {
+  return request(`/alerts/bids/${encodeURIComponent(bidNo)}/toggle`, { method: 'POST' });
+}
+
+// SET-001
+export function setNotifyEnabled(enabled) {
+  return request('/alerts/notify-enabled', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ enabled }),
+  });
+}
+
+// 카카오 연결 해제 — 저장된 토큰·구독 전부 삭제
+export function disconnectKakao() {
+  return request('/alerts/disconnect', { method: 'POST' });
+}

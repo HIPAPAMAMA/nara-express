@@ -4,5 +4,8 @@
   "outputDirectory": "web/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" }
+  ],
+  "crons": [
+    { "path": "/api/cron/run-alerts", "schedule": "0 0 * * *" }
   ]
 }
