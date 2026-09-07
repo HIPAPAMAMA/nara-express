@@ -1,9 +1,11 @@
+import { FactoryIcon, CartIcon, BellIcon, ChartIcon } from './icons';
+
 // 모바일 하단 탭 '더보기' → 자리가 없는 나머지 화면들로 가는 바텀시트
 const ITEMS = [
-  { key: 'company', icon: '🏭', label: '내 업체' },
-  { key: 'mall', icon: '🛒', label: '쇼핑몰 상품검색' },
-  { key: 'settings', icon: '⚙', label: '알림·설정' },
-  { key: 'evaluation', icon: '📊', label: '평가분석', badge: '준비중' },
+  { key: 'company', Icon: FactoryIcon, label: '내 업체' },
+  { key: 'mall', Icon: CartIcon, label: '쇼핑몰 상품검색' },
+  { key: 'settings', Icon: BellIcon, label: '알림·설정' },
+  { key: 'evaluation', Icon: ChartIcon, label: '평가분석', badge: '준비중' },
 ];
 
 export default function MobileMoreSheet({ open, onClose, onSelect }) {
@@ -26,7 +28,7 @@ export default function MobileMoreSheet({ open, onClose, onSelect }) {
               }}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-ink-800 active:bg-cream-200"
             >
-              <span className="text-lg">{item.icon}</span>
+              <item.Icon className="h-5 w-5 text-ink-400" />
               <span className="flex-1">{item.label}</span>
               {item.badge && <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[11px] text-ink-400">{item.badge}</span>}
             </button>
