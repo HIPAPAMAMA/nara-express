@@ -25,6 +25,13 @@ document.addEventListener(
   { passive: false }
 );
 
+// PWA "홈 화면에 추가" 설치 조건 충족용 — 오프라인 캐싱은 안 함(sw.js 참고)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

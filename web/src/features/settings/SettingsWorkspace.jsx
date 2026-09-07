@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../lib/authContext';
 import { fetchAlerts, setNotifyEnabled, disconnectKakao, logoutKakao, toggleTrackedBid, setCloudKeywords, setCloudSavedItems } from '../../api/client';
+import { isInstallAvailable, isIos, isStandalone, onInstallAvailabilityChange, promptInstall } from '../../lib/pwaInstall';
 
 // 로컬(localStorage)에 쌓이는 데이터 전부 — SET-003 초기화 대상 (새 화면 생기면 여기도 추가할 것)
 const LOCAL_DATA_KEYS = ['myCompany', 'savedItems', 'keywords', 'competitors', 'recentQueries'];
@@ -13,7 +14,15 @@ export default function SettingsWorkspace() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [busy, setBusy] = useState(false);
   const [importMessage, setImportMessage] = useState(null);
+  const [installAvailable, setInstallAvailable] = useState(isInstallAvailable);
   const fileInputRef = useRef(null);
+
+  useEffect(() => onInstallAvailabilityChange(setInstallAvailable), []);
+
+  async function handleInstall() {
+    await promptInstall();
+    setInstallAvailable(isInstallAvailable());
+  }
 
   useEffect(() => {
     if (auth.connected) fetchAlerts().then(setAlerts).catch(() => setAlerts(null));
@@ -205,6 +214,26 @@ export default function SettingsWorkspace() {
                 </li>
               ))}
             </ul>
+          )}
+        </div>
+      )}
+
+      {!isStandalone() && (
+        <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
+          <h3 className="mb-1 text-sm font-medium text-ink-800">홈 화면에 추가</h3>
+          {installAvailable ? (
+            <>
+              <p className="mb-3 text-xs text-ink-400">앱처럼 아이콘으로 바로 열 수 있게 홈 화면에 추가합니다.</p>
+              <button onClick={handleInstall} className="w-full rounded-lg border border-cream-400 py-2 text-xs text-ink-600">
+                홈 화면에 추가
+              </button>
+            </>
+          ) : isIos() ? (
+            <p className="text-xs text-ink-400">
+              공유 버튼(<span className="font-medium text-ink-600">⬆</span>)을 누른 뒤 "홈 화면에 추가"를 선택하세요.
+            </p>
+          ) : (
+            <p className="text-xs text-ink-400">브라우저 메뉴에서 "홈 화면에 추가" 또는 "앱 설치"를 찾아주세요.</p>
           )}
         </div>
       )}

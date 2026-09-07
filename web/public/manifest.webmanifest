@@ -1,0 +1,14 @@
+{
+  "name": "NARA express",
+  "short_name": "NARA express",
+  "description": "공공조달 통합검색",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f0e6",
+  "theme_color": "#cc785c",
+  "icons": [
+    { "src": "/app-icon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/app-icon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
