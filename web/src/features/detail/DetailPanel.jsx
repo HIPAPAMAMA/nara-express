@@ -3,6 +3,7 @@ import { formatAmount, formatDateTime } from '../../lib/format';
 import { checkRestriction, fetchAlerts, toggleTrackedBid } from '../../api/client';
 import { assessEligibility } from '../../lib/eligibility';
 import { useAuth } from '../../lib/authContext';
+import { isItemSaved, toggleSavedItem } from '../../lib/savedItems';
 
 const STATUS_LABEL = {
   restricted: { label: '제한있음', tone: 'bg-amber-100 text-amber-800' },
@@ -24,6 +25,7 @@ function DetailPanelBody({ item, onClose }) {
   const [result, setResult] = useState(null);
   const [tracked, setTracked] = useState(false);
   const [needLoginNotice, setNeedLoginNotice] = useState(false);
+  const [saved, setSaved] = useState(() => isItemSaved(item.id));
   const fitness = useMemo(() => assessEligibility(item, result), [item, result]);
 
   useEffect(() => {
@@ -35,6 +37,12 @@ function DetailPanelBody({ item, onClose }) {
       setTracked(false);
     }
   }, [item.kind, item.bidNo, auth.connected]);
+
+  // SAV-003: 첨부파일 "보관"은 실제 파일을 복사하지 않고 원문 링크(item.attachments)를 저장내역에
+  // 함께 담아두는 방식으로 처리 — item 전체가 SAV-001로 이미 저장되므로 별도 저장소 없이 해결됨.
+  function toggleSave() {
+    setSaved(toggleSavedItem(item));
+  }
 
   async function toggleBidAlert() {
     if (!auth.connected) {
@@ -159,9 +167,13 @@ function DetailPanelBody({ item, onClose }) {
         <span className="rounded-md border border-cream-400 px-2.5 py-1.5 text-ink-300" title="3단계 예정">
           낙찰결과 조회
         </span>
-        <span className="rounded-md border border-cream-400 px-2.5 py-1.5 text-ink-300" title="3단계 예정">
-          제안·규격서 저장
-        </span>
+        <button
+          onClick={toggleSave}
+          className={`rounded-md px-2.5 py-1.5 ${saved ? 'bg-clay-100 text-clay-600' : 'border border-cream-400 text-ink-600'}`}
+          title="첨부파일 원본 링크를 저장내역에 함께 보관합니다"
+        >
+          {saved ? '★ 제안·규격서 저장됨' : '☆ 제안·규격서 저장'}
+        </button>
         {/* RES-018: 이 공고가 낙찰 결과를 발표하면 카카오톡으로 알림 — 입찰공고에만 의미 있음 */}
         {item.kind === 'bid' && (
           <button
