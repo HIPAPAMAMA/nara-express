@@ -17,7 +17,8 @@ function getAuthorizeUrl(state) {
   url.searchParams.set('client_id', getEnv('KAKAO_CLIENT_ID'));
   url.searchParams.set('redirect_uri', getEnv('KAKAO_REDIRECT_URI'));
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', 'talk_message');
+  // talk_message만 요청하면 닉네임 동의가 빠져서 kakao_account.profile이 응답에 안 실린다
+  url.searchParams.set('scope', 'talk_message,profile_nickname');
   url.searchParams.set('state', state);
   return url.toString();
 }
