@@ -1,3 +1,4 @@
+const path = require('node:path');
 const AdmZip = require('adm-zip');
 const { XMLParser } = require('fast-xml-parser');
 
@@ -70,29 +71,20 @@ function extractHwpxText(buffer) {
   return out;
 }
 
-// HWP(구형, 바이너리)는 Cloud Run(LibreOffice headless) 변환기가 필요하다.
-// CLOUD_RUN_HWP_CONVERT_URL이 설정되지 않았으면 처리 불가로 명확히 표시한다 (조용히 무시하지 않는다).
-// TODO(배포 시): services/hwp-convert를 --no-allow-unauthenticated로 배포했다면, 아래 fetch에
-// Google ID 토큰(Authorization: Bearer ...)을 붙여야 한다 (google-auth-library의
-// GoogleAuth#getIdTokenClient 사용 권장). 지금은 인증 없는 호출로만 구현돼 있다 — 미검증.
-async function extractHwpText(buffer) {
-  const convertUrl = process.env.CLOUD_RUN_HWP_CONVERT_URL;
-  if (!convertUrl) {
-    const err = new Error('구형 HWP 파일은 지원하지 않습니다.');
-    err.unsupported = true;
-    throw err;
-  }
-  const res = await fetch(convertUrl, {
-    method: 'POST',
-    headers: { 'content-type': 'application/octet-stream' },
-    body: buffer,
-  });
-  if (!res.ok) {
-    const err = new Error(`HWP 변환 실패 (HTTP ${res.status})`);
-    throw err;
-  }
-  const json = await res.json();
-  return json.text || '';
+// HWP(구형, 바이너리)는 @ohah/hwpjs(Rust 기반 네이티브 파서, napi-rs)로 직접 텍스트를 뽑는다.
+// Cloud Run(LibreOffice headless) 변환기 없이 서버리스 함수 안에서 바로 처리 가능 — 예전엔
+// Cloud Run이 필요해서 보류했었는데, 실제 나라장터 공고문 hwp로 테스트해보니 이 방식으로 충분했다.
+// 패키지의 exports 맵이 서브패스를 막아놔서 일반 require('@ohah/hwpjs')는 조건에 따라
+// browser.js(wasm)로 잘못 풀릴 수 있다 — 패키지 루트를 찾아 dist/index.js를 절대경로로 직접 require.
+function loadHwpjs() {
+  const pkgDir = path.dirname(require.resolve('@ohah/hwpjs/package.json'));
+  return require(path.join(pkgDir, 'dist', 'index.js'));
+}
+
+function extractHwpText(buffer) {
+  const { toMarkdown } = loadHwpjs();
+  const { markdown } = toMarkdown(buffer, {});
+  return markdown || '';
 }
 
 /** 첨부파일 하나를 다운로드해 텍스트로 변환한다. 실패 시 { error } 를 반환(throw하지 않음). */

@@ -81,10 +81,11 @@ async function checkRestriction(attachments) {
   }
 
   if (filesFailed.length > 0) {
-    // 구형 HWP만 읽지 못한 경우(가장 흔한 케이스)는 "시스템 오류"가 아니라 "지원 범위 밖"임을 명확히 안내
+    // PDF·HWP·HWPX 외의 파일 형식(예: .doc, .xlsx, .zip)만 읽지 못한 경우는 "시스템 오류"가
+    // 아니라 "지원 범위 밖"임을 명확히 안내 — hwp는 이제 hwpjs로 지원되니 여기 해당 안 됨
     const allUnsupported = filesFailed.every((f) => f.unsupported);
     const note = allUnsupported
-      ? '구형 HWP 파일은 자동 판정을 지원하지 않습니다(PDF·최신 HWPX는 지원). 원문에서 직접 확인해주세요.'
+      ? '지원하지 않는 파일 형식입니다(PDF·HWP·HWPX만 자동 판정 지원). 원문에서 직접 확인해주세요.'
       : `${filesFailed.length}개 파일을 읽지 못했습니다. 원문에서 직접 확인하세요.`;
     return {
       status: 'needs_review',
