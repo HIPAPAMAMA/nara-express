@@ -78,14 +78,14 @@ function AppShell() {
   return (
     <div className="min-h-screen bg-cream-200 pb-14 md:pb-0">
       <header className="border-b border-cream-400 bg-cream-100">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-2.5">
           <img src={logo} alt="NARA express" className="h-7 w-auto" />
           <span className={`flex items-center gap-1.5 text-xs ${health === 'ok' ? 'text-sage-600' : 'text-amber-600'}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${health === 'ok' ? 'bg-sage-600' : 'bg-amber-600'}`} />
             {health === 'checking' ? 'API 확인 중' : health === 'ok' ? 'API 정상' : 'API 응답 지연'}
           </span>
         </div>
-        <nav className="mx-auto hidden max-w-6xl gap-1 overflow-x-auto px-4 pb-2 text-xs md:flex">
+        <nav className="mx-auto hidden max-w-[1600px] gap-1 overflow-x-auto px-4 pb-2 text-xs md:flex">
           {NAV_TABS.map((tab) => (
             <button
               key={tab.key}
@@ -100,7 +100,7 @@ function AppShell() {
         </nav>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="mx-auto max-w-[1600px] px-4 py-6">
         {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} prefill={searchPrefill} />}
         {view === 'competitor' && <CompetitorWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'company' && <MyCompanyWorkspace />}
