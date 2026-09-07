@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../lib/authContext';
-import { fetchAlerts, toggleKeywordAlert } from '../../api/client';
+import { fetchAlerts, toggleKeywordAlert, setCloudKeywords } from '../../api/client';
 
 const STORAGE_KEY = 'keywords';
 
@@ -28,6 +28,15 @@ export default function KeywordWorkspace({ onSearchKeyword }) {
     else setAlertKeywords([]);
   }, [auth.connected]);
 
+  // 기기 간 이어보기: 카카오 연결 시 로컬↔서버 병합이 끝나면 authContext가 이 이벤트를 쏜다
+  useEffect(() => {
+    function onSync() {
+      setKeywords(loadKeywords());
+    }
+    window.addEventListener('nra:cloudsync', onSync);
+    return () => window.removeEventListener('nra:cloudsync', onSync);
+  }, []);
+
   function addKeyword(e) {
     e.preventDefault();
     const trimmed = input.trim();
@@ -35,6 +44,7 @@ export default function KeywordWorkspace({ onSearchKeyword }) {
     const next = [...keywords, trimmed];
     setKeywords(next);
     saveKeywords(next);
+    if (auth.connected) setCloudKeywords(next).catch(() => {});
     setInput('');
   }
 
@@ -42,6 +52,7 @@ export default function KeywordWorkspace({ onSearchKeyword }) {
     const next = keywords.filter((k) => k !== kw);
     setKeywords(next);
     saveKeywords(next);
+    if (auth.connected) setCloudKeywords(next).catch(() => {});
   }
 
   async function toggleAlert(kw) {

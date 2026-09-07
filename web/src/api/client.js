@@ -105,3 +105,25 @@ export function setNotifyEnabled(enabled) {
 export function disconnectKakao() {
   return request('/alerts/disconnect', { method: 'POST' });
 }
+
+// 관심 키워드·저장내역 서버 동기화 (기기 간 이어보기, 카카오 로그인 필요)
+export function getCloudKeywords() {
+  return request('/userdata/keywords');
+}
+export function setCloudKeywords(keywords) {
+  return request('/userdata/keywords', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keywords }),
+  });
+}
+export function getCloudSavedItems() {
+  return request('/userdata/saved');
+}
+export function setCloudSavedItems(items) {
+  return request('/userdata/saved', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items }),
+  });
+}

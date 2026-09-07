@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getMe } from '../api/client';
+import { syncOnConnect, disableCloudSync } from './cloudSync';
 
 const AuthContext = createContext(null);
 
@@ -9,14 +10,17 @@ export function AuthProvider({ children }) {
 
   const refresh = useCallback(() => {
     getMe()
-      .then((res) =>
+      .then((res) => {
         setAuth({
           status: 'ready',
           connected: res.connected,
           nickname: res.nickname || null,
           notifyEnabled: res.notifyEnabled !== false,
-        })
-      )
+        });
+        // 관심 키워드·저장내역 기기 간 이어보기 — 연결돼 있으면 로컬↔서버 병합, 아니면 동기화 끔
+        if (res.connected) syncOnConnect().catch(() => {});
+        else disableCloudSync();
+      })
       .catch(() => setAuth({ status: 'ready', connected: false, nickname: null, notifyEnabled: true }));
   }, []);
 

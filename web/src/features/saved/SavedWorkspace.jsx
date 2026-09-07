@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { loadSavedItems } from '../../lib/savedItems';
 import ResultRow from '../results/ResultRow';
 import { exportCsv, exportExcel } from '../../lib/export';
@@ -8,6 +8,15 @@ const KIND_LABEL = { bid: '입찰공고', award: '낙찰결과', prespec: '사�
 // SC-06 저장내역: SAV-001(저장/해제) SAV-002(목록 조회). SAV-003(첨부파일 보관)은 미구현.
 export default function SavedWorkspace({ onOpenDetail }) {
   const [items, setItems] = useState(loadSavedItems);
+
+  // 기기 간 이어보기: 카카오 연결 시 로컬↔서버 병합이 끝나면 authContext가 이 이벤트를 쏜다
+  useEffect(() => {
+    function onSync() {
+      setItems(loadSavedItems());
+    }
+    window.addEventListener('nra:cloudsync', onSync);
+    return () => window.removeEventListener('nra:cloudsync', onSync);
+  }, []);
 
   const kindCounts = useMemo(() => {
     const map = new Map();
