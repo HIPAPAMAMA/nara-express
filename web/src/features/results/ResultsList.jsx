@@ -188,13 +188,13 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
           </select>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setDense((v) => !v)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[11px] text-ink-600">
+          <button onClick={() => setDense((v) => !v)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[12px] text-ink-600">
             {dense ? '상세 보기' : '간단 보기'}
           </button>
-          <button onClick={() => exportCsv(filtered)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[11px] text-ink-600">
+          <button onClick={() => exportCsv(filtered)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[12px] text-ink-600">
             CSV
           </button>
-          <button onClick={() => exportExcel(filtered)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[11px] text-ink-600">
+          <button onClick={() => exportExcel(filtered)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[12px] text-ink-600">
             Excel
           </button>
         </div>
@@ -202,7 +202,7 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
 
       {/* 7.4절: 좁은 창에서는 표 영역만 가로 스크롤 허용 (필터·네비는 고정) — 720px 최소폭은 데스크톱 표 전용, 모바일 카드엔 강제하지 않는다 */}
       <div className="overflow-x-auto rounded-xl border border-cream-400 bg-cream-50">
-        <div className={`hidden lg:grid lg:min-w-[720px] ${DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[11px] font-medium text-ink-400`}>
+        <div className={`hidden lg:grid lg:min-w-[720px] ${DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[12px] font-medium text-ink-400`}>
           <div>공고·사업명</div>
           <div>업체·기관</div>
           <div className="text-right">금액·일정</div>

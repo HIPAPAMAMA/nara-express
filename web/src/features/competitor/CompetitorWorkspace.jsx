@@ -199,7 +199,7 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
 
         <form onSubmit={handleMatchByName} className="rounded-xl border border-cream-400 bg-cream-100 p-4">
           <h3 className="mb-2 text-sm font-medium text-ink-800">업체명 자동 매칭</h3>
-          <p className="mb-2 text-[11px] text-ink-400">업체명만 입력해도 자동 등록 — 최근 1년 낙찰 이력에서 검색합니다.</p>
+          <p className="mb-2 text-[12px] text-ink-400">업체명만 입력해도 자동 등록 — 최근 1년 낙찰 이력에서 검색합니다.</p>
           <div className="flex gap-2">
             <input
               value={nameInput}
@@ -211,10 +211,10 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
               {matching ? '검색 중…' : '검색'}
             </button>
           </div>
-          {matchError && <p className="mt-2 text-[11px] text-amber-800">{matchError}</p>}
+          {matchError && <p className="mt-2 text-[12px] text-amber-800">{matchError}</p>}
           {candidates && (
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {candidates.length === 0 && <span className="text-[11px] text-ink-300">일치하는 낙찰 이력이 없습니다.</span>}
+              {candidates.length === 0 && <span className="text-[12px] text-ink-300">일치하는 낙찰 이력이 없습니다.</span>}
               {candidates.map((c) => (
                 <button
                   key={c.bizNo}
@@ -270,10 +270,10 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
                   <input type="checkbox" checked={selected.has(c.bizNo)} onChange={() => toggleSelect(c.bizNo)} />
                   <span className="flex-1 text-ink-800">{c.name}</span>
                   <span className="text-xs text-ink-400">{c.bizNo}</span>
-                  <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-clay-600">
+                  <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[12px] text-clay-600">
                     분석
                   </button>
-                  <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-ink-400">
+                  <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[12px] text-ink-400">
                     삭제
                   </button>
                 </div>
@@ -286,10 +286,10 @@ export default function CompetitorWorkspace({ onOpenDetail }) {
                   <div className="flex items-center justify-between pl-6">
                     <span className="text-xs text-ink-400">{c.bizNo}</span>
                     <div className="flex gap-2">
-                      <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-clay-600">
+                      <button onClick={() => runAnalysis([c])} className="rounded border border-cream-400 px-2 py-0.5 text-[12px] text-clay-600">
                         분석
                       </button>
-                      <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[11px] text-ink-400">
+                      <button onClick={() => removeCompetitor(c.bizNo)} className="rounded border border-cream-400 px-2 py-0.5 text-[12px] text-ink-400">
                         삭제
                       </button>
                     </div>

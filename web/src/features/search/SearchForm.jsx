@@ -242,7 +242,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
           className={`flex-1 px-3 py-2 ${mode === 'quick' ? 'bg-clay-100 font-medium text-clay-600' : 'text-ink-400'}`}
         >
           빠른 조회
-          <div className="font-normal text-[10px] text-ink-300">최근 구간만, 속도 우선</div>
+          <div className="font-normal text-[11px] text-ink-300">최근 구간만, 속도 우선</div>
         </button>
         <button
           type="button"
@@ -251,7 +251,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
           className={`flex-1 border-l border-cream-400 px-3 py-2 ${mode === 'full' ? 'bg-clay-100 font-medium text-clay-600' : 'text-ink-400'}`}
         >
           정밀 조회
-          <div className="font-normal text-[10px] text-ink-300">전체 기간 순회, 시간 소요</div>
+          <div className="font-normal text-[11px] text-ink-300">전체 기간 순회, 시간 소요</div>
         </button>
       </div>
 
@@ -278,7 +278,7 @@ export default function SearchForm({ onSearch, loading, onCancel, initialKeyword
               key={i}
               type="button"
               onClick={() => restoreQuery(q)}
-              className="rounded-full border border-cream-400 px-2.5 py-1 text-[11px] text-ink-400 hover:bg-cream-200"
+              className="rounded-full border border-cream-400 px-2.5 py-1 text-[12px] text-ink-400 hover:bg-cream-200"
             >
               {q.keyword || `${q.kind}·${q.from}~${q.to}`}
             </button>

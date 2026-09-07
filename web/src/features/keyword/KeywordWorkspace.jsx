@@ -71,7 +71,7 @@ export default function KeywordWorkspace({ onSearchKeyword }) {
         </div>
       )}
 
-      <p className="mt-4 text-[11px] text-ink-300">키워드 신규공고 알림(KWD-003)은 4단계(카카오톡 연동)에서 추가됩니다.</p>
+      <p className="mt-4 text-[12px] text-ink-300">키워드 신규공고 알림(KWD-003)은 4단계(카카오톡 연동)에서 추가됩니다.</p>
     </div>
   );
 }

@@ -3,6 +3,10 @@
 @theme {
   --font-sans: "Pretendard", -apple-system, "Malgun Gothic", sans-serif;
 
+  /* 전반적으로 글자가 작다는 피드백 반영 — 기본 스케일을 한 단계씩 올림 */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+
   /* 7.2 컬러 토큰 */
   --color-cream-50: #fffefc;
   --color-cream-100: #faf8f3;
@@ -40,7 +44,7 @@ body {
   background: var(--color-cream-200);
   color: var(--color-ink-800);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
 

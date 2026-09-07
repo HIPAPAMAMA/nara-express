@@ -9,7 +9,7 @@ function Badge({ tone, children }) {
     warning: 'bg-amber-100 text-amber-600',
     neutral: 'bg-ink-100 text-ink-400',
   }[tone];
-  return <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${toneClass} whitespace-nowrap`}>{children}</span>;
+  return <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${toneClass} whitespace-nowrap`}>{children}</span>;
 }
 
 function barColor(item) {
@@ -67,7 +67,7 @@ function OrgCell({ item }) {
     return (
       <>
         <div className="truncate text-ink-800">{item.winner?.name || '-'}</div>
-        <div className="truncate text-[11px] text-ink-400">{item.winner?.bizNo || '사업자번호 미제공'}</div>
+        <div className="truncate text-[12px] text-ink-400">{item.winner?.bizNo || '사업자번호 미제공'}</div>
       </>
     );
   }
@@ -75,7 +75,7 @@ function OrgCell({ item }) {
     <>
       <div className="truncate text-ink-800">{item.orderOrg || '-'}</div>
       {item.demandOrg && item.demandOrg !== item.orderOrg && (
-        <div className="truncate text-[11px] text-ink-400">{item.demandOrg}</div>
+        <div className="truncate text-[12px] text-ink-400">{item.demandOrg}</div>
       )}
     </>
   );
@@ -87,7 +87,7 @@ function AmountCell({ item }) {
     return (
       <>
         <div className="tabular-nums text-ink-800">{formatAmount(item.awardAmount)}</div>
-        <div className="tabular-nums text-[11px] text-ink-400">
+        <div className="tabular-nums text-[12px] text-ink-400">
           {item.estimatedPrice != null ? `예산 ${formatAmount(item.estimatedPrice)}` : '예산 미제공'}
         </div>
       </>
@@ -97,7 +97,7 @@ function AmountCell({ item }) {
     return (
       <>
         <div className="tabular-nums text-ink-800">{formatAmount(item.estimatedPrice)}</div>
-        <div className="text-[11px] text-ink-400">개찰 {formatDateTime(item.openingAt)}</div>
+        <div className="text-[12px] text-ink-400">개찰 {formatDateTime(item.openingAt)}</div>
       </>
     );
   }
@@ -126,14 +126,14 @@ export default function ResultRow({ item, dense, onOpenDetail, onCopyBidNo, onTo
             <span className="truncate text-sm text-ink-800">{item.title}</span>
             {kindBadge(item, badge)}
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-400">
+          <div className="mt-0.5 flex items-center gap-1.5 text-[12px] text-ink-400">
             <span>{item.bidNo}</span>
             <CopyIcon bidNo={item.bidNo} onCopyBidNo={onCopyBidNo} />
             <SaveIcon item={item} onToggleSave={onToggleSave} />
             {!dense && <span>· {formatDateTime(item.postedAt, { seconds: true })}</span>}
           </div>
           {!dense && (
-            <div className="mt-0.5 truncate text-[11px] text-ink-400">
+            <div className="mt-0.5 truncate text-[12px] text-ink-400">
               {item.orderOrg}
               {item.demandOrg && item.demandOrg !== item.orderOrg ? ` / ${item.demandOrg}` : ''}
               {item.winner && ` · ${item.winner.name} (${item.winner.bizNo || '사업자번호 미제공'})`}
@@ -152,7 +152,7 @@ export default function ResultRow({ item, dense, onOpenDetail, onCopyBidNo, onTo
             <span className="truncate text-sm text-ink-800">{item.title}</span>
             {kindBadge(item, badge)}
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-400">
+          <div className="mt-0.5 flex items-center gap-1.5 text-[12px] text-ink-400">
             <span>{item.bidNo}</span>
             <CopyIcon bidNo={item.bidNo} onCopyBidNo={onCopyBidNo} />
             <SaveIcon item={item} onToggleSave={onToggleSave} />

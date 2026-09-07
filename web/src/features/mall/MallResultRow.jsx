@@ -7,7 +7,7 @@ export default function MallResultRow({ item }) {
       {/* 모바일 카드 */}
       <div className="border-b border-cream-400 p-3 text-xs last:border-b-0 lg:hidden">
         <div className="mb-1 flex items-center gap-1.5">
-          <span className="rounded bg-sage-100 px-1.5 py-0.5 text-[10px] font-medium text-sage-600">{item.entrprsDivNm}</span>
+          <span className="rounded bg-sage-100 px-1.5 py-0.5 text-[11px] font-medium text-sage-600">{item.entrprsDivNm}</span>
           <span className="text-ink-800">{item.prdctSpecNm}</span>
         </div>
         <div className="mb-1 flex flex-wrap gap-x-3 text-ink-400">
@@ -27,7 +27,7 @@ export default function MallResultRow({ item }) {
         {item.certList.length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">
             {item.certList.map((c) => (
-              <span key={c} className="rounded bg-cream-200 px-1.5 py-0.5 text-[10px] text-ink-400">
+              <span key={c} className="rounded bg-cream-200 px-1.5 py-0.5 text-[11px] text-ink-400">
                 {c}
               </span>
             ))}
@@ -39,14 +39,14 @@ export default function MallResultRow({ item }) {
       <div className={`hidden ${MALL_DESKTOP_GRID_COLS} items-center gap-3 border-b border-cream-400 px-3.5 py-2.5 text-xs last:border-b-0 lg:grid`}>
         <div>
           <div className="mb-0.5 flex items-center gap-1.5">
-            <span className="rounded bg-sage-100 px-1.5 py-0.5 text-[10px] font-medium text-sage-600">{item.entrprsDivNm}</span>
+            <span className="rounded bg-sage-100 px-1.5 py-0.5 text-[11px] font-medium text-sage-600">{item.entrprsDivNm}</span>
             <span className="text-ink-800">{item.prdctSpecNm}</span>
           </div>
-          <div className="text-[11px] text-ink-400">물품식별번호 {item.prdctIdntNo}</div>
+          <div className="text-[12px] text-ink-400">물품식별번호 {item.prdctIdntNo}</div>
           {item.certList.length > 0 && (
             <div className="mt-0.5 flex flex-wrap gap-1">
               {item.certList.map((c) => (
-                <span key={c} className="rounded bg-cream-200 px-1.5 py-0.5 text-[10px] text-ink-400">
+                <span key={c} className="rounded bg-cream-200 px-1.5 py-0.5 text-[11px] text-ink-400">
                   {c}
                 </span>
               ))}
@@ -63,7 +63,7 @@ export default function MallResultRow({ item }) {
         <div className="text-right tabular-nums font-medium text-ink-800">
           {item.cntrctPrceAmt?.toLocaleString()}원
           <br />
-          <span className="text-[11px] font-normal text-ink-400">/ {item.prdctUnit}</span>
+          <span className="text-[12px] font-normal text-ink-400">/ {item.prdctUnit}</span>
         </div>
       </div>
     </>

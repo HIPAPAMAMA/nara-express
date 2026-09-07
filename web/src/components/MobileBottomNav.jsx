@@ -18,7 +18,7 @@ export default function MobileBottomNav({ active = 'search', onSelect }) {
             key={tab.key}
             type="button"
             onClick={() => onSelect?.(tab.key)}
-            className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[9px] ${
+            className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] ${
               isActive ? 'text-clay-600' : 'text-ink-300'
             }`}
           >

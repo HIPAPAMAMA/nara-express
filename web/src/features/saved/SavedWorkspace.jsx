@@ -47,7 +47,7 @@ export default function SavedWorkspace({ onOpenDetail }) {
       {/* 데스크톱 전용 요약 — 모바일은 헤딩의 건수 뱃지로 충분해서 숨김 */}
       <div className="hidden lg:block">
         <div className="rounded-xl border border-cream-400 bg-cream-100 p-4 text-xs">
-          <div className="mb-2 text-[11px] font-medium text-ink-400">유형별 건수</div>
+          <div className="mb-2 text-[12px] font-medium text-ink-400">유형별 건수</div>
           <dl className="mb-3 space-y-1.5">
             {kindCounts.map(([kind, count]) => (
               <div key={kind} className="flex justify-between">

@@ -28,7 +28,7 @@ export default function MobileMoreSheet({ open, onClose, onSelect }) {
             >
               <span className="text-lg">{item.icon}</span>
               <span className="flex-1">{item.label}</span>
-              {item.badge && <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-400">{item.badge}</span>}
+              {item.badge && <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[11px] text-ink-400">{item.badge}</span>}
             </button>
           ))}
         </div>

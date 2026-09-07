@@ -192,7 +192,7 @@ export default function MyCompanyWorkspace() {
             </button>
           </div>
           {profile.qualifications.length === 0 ? (
-            <p className="text-[11px] text-ink-300">등록된 보유자격이 없습니다. 면허·등록 정보를 넣으면 판정이 정확해집니다.</p>
+            <p className="text-[12px] text-ink-300">등록된 보유자격이 없습니다. 면허·등록 정보를 넣으면 판정이 정확해집니다.</p>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {profile.qualifications.map((q, i) => (
@@ -223,7 +223,7 @@ export default function MyCompanyWorkspace() {
             </button>
           </div>
           {profile.performances.length === 0 ? (
-            <p className="text-[11px] text-ink-300">등록된 수행실적이 없습니다.</p>
+            <p className="text-[12px] text-ink-300">등록된 수행실적이 없습니다.</p>
           ) : (
             <ul className="space-y-1">
               {profile.performances.map((p, i) => (
@@ -259,7 +259,7 @@ export default function MyCompanyWorkspace() {
         </div>
       </div>
 
-      <p className="mt-3 text-[11px] text-ink-300">
+      <p className="mt-3 text-[12px] text-ink-300">
         공고 적합도 판정(MYC-007)은 통합검색 결과와 연동해 3단계 후반에 추가됩니다. 최종 확인은 항상 원문에서 하세요.
       </p>
     </div>

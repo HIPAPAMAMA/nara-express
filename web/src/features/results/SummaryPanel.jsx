@@ -21,7 +21,7 @@ export default function SummaryPanel({ response }) {
 
   return (
     <div className="rounded-xl border border-cream-400 bg-cream-100 p-4 text-xs">
-      <div className="mb-2 text-[11px] font-medium text-ink-400">조회 요약</div>
+      <div className="mb-2 text-[12px] font-medium text-ink-400">조회 요약</div>
       <dl className="space-y-1.5">
         <div className="flex justify-between">
           <dt className="text-ink-400">검색건수</dt>

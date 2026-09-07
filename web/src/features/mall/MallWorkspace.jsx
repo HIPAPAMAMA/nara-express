@@ -129,7 +129,7 @@ export default function MallWorkspace() {
                   value={priceMinFilter}
                   onChange={(e) => setPriceMinFilter(e.target.value)}
                   placeholder="하한"
-                  className="w-full rounded border border-cream-400 px-1.5 py-1 text-[11px]"
+                  className="w-full rounded border border-cream-400 px-1.5 py-1 text-[12px]"
                 />
                 <span className="text-ink-300">~</span>
                 <input
@@ -137,7 +137,7 @@ export default function MallWorkspace() {
                   value={priceMaxFilter}
                   onChange={(e) => setPriceMaxFilter(e.target.value)}
                   placeholder="상한"
-                  className="w-full rounded border border-cream-400 px-1.5 py-1 text-[11px]"
+                  className="w-full rounded border border-cream-400 px-1.5 py-1 text-[12px]"
                 />
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function MallWorkspace() {
               <div className="rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">조건에 맞는 상품이 없습니다.</div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-cream-400 bg-cream-50">
-                <div className={`hidden ${MALL_DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[11px] font-medium text-ink-400 lg:grid`}>
+                <div className={`hidden ${MALL_DESKTOP_GRID_COLS} gap-3 border-b border-cream-400 bg-cream-100 px-3.5 py-2 text-[12px] font-medium text-ink-400 lg:grid`}>
                   <div>품명·규격</div>
                   <div>제조사</div>
                   <div>원산지</div>

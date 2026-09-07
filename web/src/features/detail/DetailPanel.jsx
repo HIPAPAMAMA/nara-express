@@ -62,18 +62,18 @@ function DetailPanelBody({ item, onClose }) {
       <div className="mb-4 rounded-lg border border-cream-400 p-3">
         <div className="mb-1.5 flex items-center justify-between">
           <span className="text-xs font-medium text-ink-600">공고 적합도 (참고용)</span>
-          <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${FIT_LABEL[fitness.status].tone}`}>
+          <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${FIT_LABEL[fitness.status].tone}`}>
             {FIT_LABEL[fitness.status].label}
           </span>
         </div>
         {fitness.reasons.length > 0 && (
-          <ul className="list-inside list-disc space-y-0.5 text-[11px] text-ink-600">
+          <ul className="list-inside list-disc space-y-0.5 text-[12px] text-ink-600">
             {fitness.reasons.map((r, i) => (
               <li key={i}>{r}</li>
             ))}
           </ul>
         )}
-        <p className="mt-1 text-[11px] text-ink-300">구조화된 필드 기반 참고 정보입니다. 최종 확인은 원문에서 하세요.</p>
+        <p className="mt-1 text-[12px] text-ink-300">구조화된 필드 기반 참고 정보입니다. 최종 확인은 원문에서 하세요.</p>
       </div>
 
       {/* DTL-009·010 대기업 참여제한 확인 */}
@@ -81,7 +81,7 @@ function DetailPanelBody({ item, onClose }) {
         <div className="mb-2 flex items-center justify-between">
           <span className="text-xs font-medium text-ink-600">대기업 참여제한 확인</span>
           {result && (
-            <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${STATUS_LABEL[result.status]?.tone}`}>
+            <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${STATUS_LABEL[result.status]?.tone}`}>
               {STATUS_LABEL[result.status]?.label}
             </span>
           )}
@@ -96,13 +96,13 @@ function DetailPanelBody({ item, onClose }) {
           </button>
         )}
         {result && (
-          <div className="text-[11px] text-ink-600">
+          <div className="text-[12px] text-ink-600">
             {result.excerpt && <p className="mb-1 rounded bg-amber-50 p-1.5 italic">"…{result.excerpt}…" ({result.matchedFile})</p>}
             {result.note && <p className="text-ink-400">{result.note}</p>}
             <p className="mt-1 text-ink-300">최종 확인은 반드시 원문에서 하세요. 키워드 매칭 기준이라 완벽하지 않습니다.</p>
           </div>
         )}
-        {item.attachments.length === 0 && !result && <p className="mt-1 text-[11px] text-ink-300">첨부파일이 없습니다.</p>}
+        {item.attachments.length === 0 && !result && <p className="mt-1 text-[12px] text-ink-300">첨부파일이 없습니다.</p>}
       </div>
 
       {/* DTL-003 첨부파일 목록 */}
