@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ResultRow from './ResultRow';
 import { exportCsv, exportExcel } from '../../lib/export';
 import { DESKTOP_GRID_COLS } from './gridTemplate';
@@ -12,9 +12,26 @@ const SORT_OPTIONS = [
   { value: 'deadline', label: '마감임박순' },
   { value: 'recent', label: '최신순' },
 ];
+const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100];
+const DEFAULT_PAGE_SIZE = 20;
 
 function amountOf(item) {
   return item.awardAmount ?? item.estimatedPrice ?? 0;
+}
+
+// 페이지 번호를 전부 나열하면 정밀조회처럼 페이지가 수백 개일 때 줄이 끝없이 길어져서
+// 현재 페이지 주변 + 처음/끝만 보여주고 나머지는 "…"로 줄인다
+function pageNumbers(current, total) {
+  const delta = 2;
+  const range = [];
+  for (let i = Math.max(2, current - delta); i <= Math.min(total - 1, current + delta); i++) range.push(i);
+
+  const result = [1];
+  if (range[0] > 2) result.push('…');
+  result.push(...range);
+  if (range[range.length - 1] < total - 1) result.push('…');
+  if (total > 1) result.push(total);
+  return result;
 }
 
 export default function ResultsList({ response, loading, error, onOpenDetail }) {
@@ -22,7 +39,8 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
   const [textFilter, setTextFilter] = useState(''); // RES-004
   const [sort, setSort] = useState('default');
   const [dense, setDense] = useState(false); // RES-007
-  const [visibleCount, setVisibleCount] = useState(30); // RES-008
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE); // RES-008: 아래로 무한히 늘어나지 않게 페이지로 분할
+  const [page, setPage] = useState(1);
   const topRef = useRef(null);
 
   const items = response?.items ?? [];
@@ -47,19 +65,36 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
     return sorted;
   }, [items, typeFilter, textFilter, sort]);
 
-  const visible = filtered.slice(0, visibleCount);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  // 필터·정렬이 바뀌거나 새로 조회하면 1페이지로 되돌린다 — 안 그러면 예전 페이지 번호가 남아
+  // 빈 화면이 뜨는 경우가 생김
+  useEffect(() => {
+    setPage(1);
+  }, [typeFilter, textFilter, sort, pageSize, items]);
+
+  function goToPage(p) {
+    setPage(p);
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
 
   function copyBidNo(bidNo) {
     navigator.clipboard?.writeText(bidNo);
   }
 
   if (loading) {
-    return <div className="rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">조회 중입니다…</div>;
+    return (
+      <div className="flex h-full min-h-[240px] items-center justify-center rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">
+        조회 중입니다…
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm text-amber-800">
+      <div className="flex h-full min-h-[240px] items-center justify-center rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm text-amber-800">
         {error}
       </div>
     );
@@ -67,7 +102,7 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
 
   if (!response) {
     return (
-      <div className="rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">
+      <div className="flex h-full min-h-[240px] items-center justify-center rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">
         조회 조건을 설정하고 조회하기를 눌러주세요.
       </div>
     );
@@ -76,7 +111,7 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
   if (items.length === 0 && response.jobStatus !== 'running') {
     // RES-024
     return (
-      <div className="rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">
+      <div className="flex h-full min-h-[240px] items-center justify-center rounded-xl border border-cream-400 bg-cream-100 p-10 text-center text-sm text-ink-400">
         조건에 맞는 결과가 없습니다. 기간이나 검색어를 조정해보세요.
       </div>
     );
@@ -146,6 +181,17 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
             </option>
           ))}
         </select>
+        <select
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="rounded-md border border-cream-400 px-2 py-1 text-xs"
+        >
+          {PAGE_SIZE_OPTIONS.map((n) => (
+            <option key={n} value={n}>
+              {n}개씩 보기
+            </option>
+          ))}
+        </select>
         <button onClick={() => setDense((v) => !v)} className="rounded-md border border-cream-400 px-2.5 py-1 text-xs text-ink-600">
           {dense ? '상세 보기' : '간단 보기'}
         </button>
@@ -188,6 +234,17 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
           </select>
         </div>
         <div className="flex gap-2">
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            className="flex-1 rounded-md border border-cream-400 px-2 py-1 text-[12px]"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => (
+              <option key={n} value={n}>
+                {n}개씩 보기
+              </option>
+            ))}
+          </select>
           <button onClick={() => setDense((v) => !v)} className="flex-1 rounded-md border border-cream-400 px-2.5 py-1 text-[12px] text-ink-600">
             {dense ? '상세 보기' : '간단 보기'}
           </button>
@@ -215,22 +272,45 @@ export default function ResultsList({ response, loading, error, onOpenDetail }) 
         </div>
       </div>
 
-      <div className="mt-3 flex justify-center gap-2">
-        {visibleCount < filtered.length && (
+      {/* RES-008: 무한히 아래로 늘어나는 대신 페이지로 분할, 사용자가 페이지당 개수를 고를 수 있음 */}
+      {pageCount > 1 && (
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-xs">
           <button
-            onClick={() => setVisibleCount((v) => v + 30)}
-            className="rounded-lg border border-cream-400 px-4 py-2 text-xs text-ink-600"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className="rounded-md border border-cream-400 px-2.5 py-1.5 text-ink-600 disabled:opacity-40"
           >
-            더 보기 ({filtered.length - visibleCount}건 남음)
+            이전
           </button>
-        )}
-        <button
-          onClick={() => topRef.current?.scrollIntoView({ behavior: 'smooth' })}
-          className="rounded-lg border border-cream-400 px-4 py-2 text-xs text-ink-600"
-        >
-          맨 위로
-        </button>
-      </div>
+          {pageNumbers(currentPage, pageCount).map((p, i) =>
+            p === '…' ? (
+              <span key={`ellipsis-${i}`} className="px-1 text-ink-300">
+                …
+              </span>
+            ) : (
+              <button
+                key={p}
+                onClick={() => goToPage(p)}
+                className={`min-w-[28px] rounded-md px-2 py-1.5 ${
+                  p === currentPage ? 'bg-clay-400 text-white' : 'border border-cream-400 text-ink-600'
+                }`}
+              >
+                {p}
+              </button>
+            )
+          )}
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage >= pageCount}
+            className="rounded-md border border-cream-400 px-2.5 py-1.5 text-ink-600 disabled:opacity-40"
+          >
+            다음
+          </button>
+          <span className="ml-1 text-ink-300">
+            {currentPage} / {pageCount} 페이지 · 총 {filtered.length}건
+          </span>
+        </div>
+      )}
     </div>
   );
 }

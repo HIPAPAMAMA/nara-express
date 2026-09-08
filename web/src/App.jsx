@@ -131,7 +131,7 @@ function AppShell() {
 
       <main className="mx-auto max-w-[1600px] px-4 py-6">
         {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} prefill={searchPrefill} />}
-        {view === 'dashboard' && <DashboardWorkspace onOpenDetail={setSelectedItem} onNavigate={setView} />}
+        {view === 'dashboard' && <DashboardWorkspace onOpenDetail={setSelectedItem} onNavigate={setView} onSearchBid={handleSearchKeyword} />}
         {view === 'company' && <MyCompanyWorkspace />}
         {view === 'settings' && <SettingsWorkspace />}
         {view === 'competitor' && <CompetitorWorkspace onOpenDetail={setSelectedItem} />}

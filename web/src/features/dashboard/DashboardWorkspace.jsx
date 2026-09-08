@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { loadSavedItems } from '../../lib/savedItems';
 import { createSearchJob, stepSearchJob } from '../../api/client';
 import { formatAmount, formatDateTime, deadlineBadge } from '../../lib/format';
+import ReannounceRadar from '../search/ReannounceRadar';
+import OrderPlanRadar from '../search/OrderPlanRadar';
 
 const MAX_KEYWORDS_TO_CHECK = 3;
 const MAX_POLLS = 40; // 이 이상 걸리면 포기 — 대시보드는 빠른 확인용이지 정밀조회가 아님
@@ -58,7 +60,7 @@ async function quickTitleSearch(keyword) {
 
 // 대시보드 — 매일 들어와서 한눈에 보는 화면(신규). API 호출이 부담스러운 검색은 자동으로 안 돌리고
 // "지금 확인" 버튼으로만 실행 — 앱을 열 때마다 정부 API를 자동으로 두드리지 않기 위함.
-export default function DashboardWorkspace({ onOpenDetail, onNavigate }) {
+export default function DashboardWorkspace({ onOpenDetail, onNavigate, onSearchBid }) {
   const [checking, setChecking] = useState(false);
   const [checkedAt, setCheckedAt] = useState(null);
   const [newBids, setNewBids] = useState(null);
@@ -119,6 +121,9 @@ export default function DashboardWorkspace({ onOpenDetail, onNavigate }) {
           </button>
         </div>
       </div>
+
+      <ReannounceRadar onSearchBid={onSearchBid} />
+      <OrderPlanRadar onSearchBid={onSearchBid} />
 
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
         <h2 className="mb-1 text-sm font-medium text-ink-800">
