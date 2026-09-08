@@ -113,9 +113,24 @@ export default function DashboardWorkspace({ onOpenDetail, onNavigate }) {
             <div className="text-lg font-medium text-ink-800">{competitors.length}</div>
             <div className="text-ink-400">경쟁사</div>
           </button>
-          <button onClick={() => onNavigate('company')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200">
+          <button onClick={() => onNavigate('mysettings')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200">
             <div className="text-sm font-medium text-ink-800">{myCompany?.corpNm ? '등록됨' : '미등록'}</div>
             <div className="text-ink-400">내 업체</div>
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
+        <h2 className="mb-2 text-sm font-medium text-ink-800">메뉴</h2>
+        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+          <button onClick={() => onNavigate('mall')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200 text-ink-800">
+            쇼핑몰 상품검색
+          </button>
+          <button onClick={() => onNavigate('saved')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200 text-ink-800">
+            저장내역
+          </button>
+          <button onClick={() => onNavigate('evaluation')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200 text-ink-400">
+            평가분석
           </button>
         </div>
       </div>

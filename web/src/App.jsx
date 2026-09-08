@@ -4,42 +4,34 @@ import DashboardWorkspace from './features/dashboard/DashboardWorkspace';
 import SearchWorkspace from './features/search/SearchWorkspace';
 import DetailPanel from './features/detail/DetailPanel';
 import CompetitorWorkspace from './features/competitor/CompetitorWorkspace';
-import MyCompanyWorkspace from './features/mycompany/MyCompanyWorkspace';
 import MallWorkspace from './features/mall/MallWorkspace';
 import KeywordWorkspace from './features/keyword/KeywordWorkspace';
 import SavedWorkspace from './features/saved/SavedWorkspace';
-import SettingsWorkspace from './features/settings/SettingsWorkspace';
+import MySettingsWorkspace from './features/mysettings/MySettingsWorkspace';
 import MobileBottomNav from './components/MobileBottomNav';
-import MobileMoreSheet from './components/MobileMoreSheet';
 import { checkHealth } from './api/client';
 import { AuthProvider } from './lib/authContext';
 
-// 대시보드가 매일 들어오는 메인 화면 — 그다음 자주 쓰는 화면(검색·키워드·경쟁사·쇼핑몰·저장내역)을
-// 앞에, 한 번 설정하고 마는 화면(내 업체·알림·설정)과 아직 미구현인 평가분석은 뒤로
+// 대메뉴는 3개로만 유지 — 통합검색(기본화면)·대시보드(키워드·경쟁사·쇼핑몰·저장내역·평가분석을
+// 메뉴 카드로 모음)·내설정(내 업체+알림·설정을 한 화면에 묶음). 나머지 화면은 대시보드의
+// 메뉴 카드를 통해서만 진입 — 상단 nav에는 안 보이지만 view 키 자체는 그대로 살아있다.
 const NAV_TABS = [
-  { key: 'dashboard', label: '대시보드' },
   { key: 'search', label: '통합검색' },
-  { key: 'keyword', label: '관심 키워드' },
-  { key: 'competitor', label: '경쟁사' },
-  { key: 'mall', label: '쇼핑몰 상품검색' },
-  { key: 'saved', label: '저장내역' },
-  { key: 'company', label: '내 업체' },
-  { key: 'settings', label: '알림·설정' },
-  { key: 'evaluation', label: '평가분석' },
+  { key: 'dashboard', label: '대시보드' },
+  { key: 'mysettings', label: '내설정' },
 ];
 
-// 모바일 하단 탭엔 5자리뿐이라 나머지는 '더보기' 시트로 — 대시보드가 메인이라 첫 자리를 차지하고,
-// 경쟁사가 대신 더보기로 밀림
-const MOBILE_KEY_MAP = {
-  dashboard: 'dashboard',
+// 대시보드 메뉴 카드로 진입한 화면(키워드·경쟁사 등)에 있을 때도 상단·하단 nav는 "대시보드"를
+// 활성 표시해야 자기가 어느 대메뉴 아래에 있는지 알 수 있다 — PC 상단 nav와 모바일 하단 탭 공용
+const TAB_GROUP_MAP = {
   search: 'search',
-  keyword: 'keyword',
-  saved: 'saved',
-  competitor: 'more',
-  company: 'more',
-  mall: 'more',
-  settings: 'more',
-  evaluation: 'more',
+  dashboard: 'dashboard',
+  keyword: 'dashboard',
+  competitor: 'dashboard',
+  mall: 'dashboard',
+  saved: 'dashboard',
+  evaluation: 'dashboard',
+  mysettings: 'mysettings',
 };
 
 function Placeholder({ label }) {
@@ -60,15 +52,10 @@ export default function App() {
 
 function AppShell() {
   const [health, setHealth] = useState('checking');
-  const [view, setView] = useState('dashboard');
+  const [view, setView] = useState('search');
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchPrefill, setSearchPrefill] = useState(null); // KWD-002: 키워드 클릭 → 검색 실행
-  const [moreOpen, setMoreOpen] = useState(false);
-
-  function handleMobileNavSelect(key) {
-    if (key === 'more') setMoreOpen(true);
-    else setView(key);
-  }
+  const activeGroup = TAB_GROUP_MAP[view] || 'search';
 
   function handleSearchKeyword(keyword) {
     setSearchPrefill({ keyword, requestedAt: Date.now() });
@@ -100,7 +87,7 @@ function AppShell() {
               key={tab.key}
               onClick={() => setView(tab.key)}
               className={`shrink-0 rounded-full px-3 py-1 ${
-                view === tab.key ? 'bg-clay-100 font-medium text-clay-600' : 'text-ink-300 hover:text-ink-600'
+                activeGroup === tab.key ? 'bg-clay-100 font-medium text-clay-600' : 'text-ink-300 hover:text-ink-600'
               }`}
             >
               {tab.label}
@@ -110,21 +97,19 @@ function AppShell() {
       </header>
 
       <main className="mx-auto max-w-[1600px] px-4 py-6">
-        {view === 'dashboard' && <DashboardWorkspace onOpenDetail={setSelectedItem} onNavigate={setView} />}
         {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} prefill={searchPrefill} />}
+        {view === 'dashboard' && <DashboardWorkspace onOpenDetail={setSelectedItem} onNavigate={setView} />}
+        {view === 'mysettings' && <MySettingsWorkspace />}
         {view === 'competitor' && <CompetitorWorkspace onOpenDetail={setSelectedItem} />}
-        {view === 'company' && <MyCompanyWorkspace />}
         {view === 'mall' && <MallWorkspace />}
         {view === 'keyword' && <KeywordWorkspace onSearchKeyword={handleSearchKeyword} />}
         {view === 'saved' && <SavedWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'evaluation' && <Placeholder label="평가분석 (5단계, 보류)" />}
-        {view === 'settings' && <SettingsWorkspace />}
       </main>
 
       {selectedItem && <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} />}
 
-      <MobileBottomNav active={MOBILE_KEY_MAP[view] || 'search'} onSelect={handleMobileNavSelect} />
-      <MobileMoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} onSelect={setView} />
+      <MobileBottomNav active={activeGroup} onSelect={setView} />
     </div>
   );
 }

@@ -1,13 +1,11 @@
-import { HomeIcon, SearchIcon, StarIcon, FolderIcon, MoreIcon } from './icons';
+import { SearchIcon, HomeIcon, SettingsIcon } from './icons';
 
-// 모바일 하단 고정 5탭 (대시보드/검색/키워드/저장내역/더보기) — 대시보드가 메인이라 첫 자리 차지,
-// 경쟁사·내 업체·쇼핑몰·설정·평가분석은 '더보기' 탭 → MobileMoreSheet로 진입
+// 모바일 하단 탭 3개 — PC 상단 대메뉴(통합검색·대시보드·내설정)와 동일 구조.
+// 나머지 화면(키워드·경쟁사·쇼핑몰·저장내역·평가분석)은 대시보드 안 메뉴 카드로 진입한다.
 const TABS = [
+  { key: 'search', Icon: SearchIcon, label: '통합검색' },
   { key: 'dashboard', Icon: HomeIcon, label: '대시보드' },
-  { key: 'search', Icon: SearchIcon, label: '검색' },
-  { key: 'keyword', Icon: StarIcon, label: '키워드' },
-  { key: 'saved', Icon: FolderIcon, label: '저장내역' },
-  { key: 'more', Icon: MoreIcon, label: '더보기' },
+  { key: 'mysettings', Icon: SettingsIcon, label: '내설정' },
 ];
 
 export default function MobileBottomNav({ active = 'search', onSelect }) {
