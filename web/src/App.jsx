@@ -4,25 +4,26 @@ import DashboardWorkspace from './features/dashboard/DashboardWorkspace';
 import SearchWorkspace from './features/search/SearchWorkspace';
 import DetailPanel from './features/detail/DetailPanel';
 import CompetitorWorkspace from './features/competitor/CompetitorWorkspace';
+import MyCompanyWorkspace from './features/mycompany/MyCompanyWorkspace';
 import MallWorkspace from './features/mall/MallWorkspace';
 import KeywordWorkspace from './features/keyword/KeywordWorkspace';
 import SavedWorkspace from './features/saved/SavedWorkspace';
-import MySettingsWorkspace from './features/mysettings/MySettingsWorkspace';
+import SettingsWorkspace from './features/settings/SettingsWorkspace';
 import MobileBottomNav from './components/MobileBottomNav';
 import { checkHealth } from './api/client';
 import { AuthProvider } from './lib/authContext';
 
-// 대메뉴는 3개로만 유지 — 통합검색(기본화면)·대시보드(키워드·경쟁사·쇼핑몰·저장내역·평가분석을
-// 메뉴 카드로 모음)·내설정(내 업체+알림·설정을 한 화면에 묶음). 나머지 화면은 대시보드의
-// 메뉴 카드를 통해서만 진입 — 상단 nav에는 안 보이지만 view 키 자체는 그대로 살아있다.
+// 대메뉴는 3개(통합검색·대시보드·내설정)뿐이지만, 대시보드·내설정 밑에는 실제 화면이 여러 개
+// 묶여 있어서 카드로 숨겨두면 잘 안 보인다는 피드백으로 "소분류 탭"을 항상 노출하는 2단 구조로
+// 바꿨다(2026-09-08) — 대메뉴 밑에 소분류 탭 줄이 하나 더 뜨는 방식, PC·모바일 공통.
 const NAV_TABS = [
-  { key: 'search', label: '통합검색' },
-  { key: 'dashboard', label: '대시보드' },
-  { key: 'mysettings', label: '내설정' },
+  { group: 'search', defaultView: 'search', label: '통합검색' },
+  { group: 'dashboard', defaultView: 'dashboard', label: '대시보드' },
+  { group: 'mysettings', defaultView: 'company', label: '내설정' },
 ];
 
-// 대시보드 메뉴 카드로 진입한 화면(키워드·경쟁사 등)에 있을 때도 상단·하단 nav는 "대시보드"를
-// 활성 표시해야 자기가 어느 대메뉴 아래에 있는지 알 수 있다 — PC 상단 nav와 모바일 하단 탭 공용
+// 대메뉴 그룹 판정 — 소분류 화면(키워드·경쟁사 등)에 있을 때도 상단 대메뉴·하단 탭이 어느 그룹
+// 소속인지 표시해야 한다
 const TAB_GROUP_MAP = {
   search: 'search',
   dashboard: 'dashboard',
@@ -31,7 +32,24 @@ const TAB_GROUP_MAP = {
   mall: 'dashboard',
   saved: 'dashboard',
   evaluation: 'dashboard',
-  mysettings: 'mysettings',
+  company: 'mysettings',
+  settings: 'mysettings',
+};
+
+// 대메뉴별 소분류 탭 — 대시보드·내설정을 누르면 이 줄이 추가로 뜬다
+const SUB_NAV = {
+  dashboard: [
+    { key: 'dashboard', label: '요약' },
+    { key: 'keyword', label: '관심 키워드' },
+    { key: 'competitor', label: '경쟁사' },
+    { key: 'mall', label: '쇼핑몰 상품검색' },
+    { key: 'saved', label: '저장내역' },
+    { key: 'evaluation', label: '평가분석' },
+  ],
+  mysettings: [
+    { key: 'company', label: '내 업체' },
+    { key: 'settings', label: '알림·설정' },
+  ],
 };
 
 function Placeholder({ label }) {
@@ -84,22 +102,38 @@ function AppShell() {
         <nav className="mx-auto hidden max-w-[1600px] gap-1 overflow-x-auto px-4 pb-2 text-xs md:flex">
           {NAV_TABS.map((tab) => (
             <button
-              key={tab.key}
-              onClick={() => setView(tab.key)}
-              className={`shrink-0 rounded-full px-3 py-1 ${
-                activeGroup === tab.key ? 'bg-clay-100 font-medium text-clay-600' : 'text-ink-300 hover:text-ink-600'
+              key={tab.group}
+              onClick={() => setView(tab.defaultView)}
+              className={`shrink-0 rounded-full px-3 py-1 font-medium ${
+                activeGroup === tab.group ? 'bg-clay-400 text-white' : 'text-ink-400 hover:bg-cream-200'
               }`}
             >
               {tab.label}
             </button>
           ))}
         </nav>
+        {SUB_NAV[activeGroup] && (
+          <nav className="mx-auto flex max-w-[1600px] gap-1 overflow-x-auto px-4 pb-2 text-xs">
+            {SUB_NAV[activeGroup].map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setView(item.key)}
+                className={`shrink-0 rounded-full px-3 py-1 ${
+                  view === item.key ? 'bg-clay-100 font-medium text-clay-600' : 'text-ink-300 hover:text-ink-600'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        )}
       </header>
 
       <main className="mx-auto max-w-[1600px] px-4 py-6">
         {view === 'search' && <SearchWorkspace onOpenDetail={setSelectedItem} prefill={searchPrefill} />}
         {view === 'dashboard' && <DashboardWorkspace onOpenDetail={setSelectedItem} onNavigate={setView} />}
-        {view === 'mysettings' && <MySettingsWorkspace />}
+        {view === 'company' && <MyCompanyWorkspace />}
+        {view === 'settings' && <SettingsWorkspace />}
         {view === 'competitor' && <CompetitorWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'mall' && <MallWorkspace />}
         {view === 'keyword' && <KeywordWorkspace onSearchKeyword={handleSearchKeyword} />}
