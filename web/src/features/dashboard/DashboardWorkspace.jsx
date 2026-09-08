@@ -76,6 +76,10 @@ export default function DashboardWorkspace({ onOpenDetail, onNavigate, onSearchB
   const keywords = useMemo(loadKeywords, []);
   const competitors = useMemo(loadCompetitors, []);
   const myCompany = useMemo(loadMyCompany, []);
+  const companySummary = useMemo(
+    () => [myCompany?.hqRegion, myCompany?.entrprsDiv, myCompany?.mainIndustry].filter(Boolean).join(' · '),
+    [myCompany]
+  );
 
   async function handleCheckNow() {
     setChecking(true);
@@ -106,18 +110,34 @@ export default function DashboardWorkspace({ onOpenDetail, onNavigate, onSearchB
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-4">
         <h2 className="mb-1 text-sm font-medium text-ink-800">등록 현황</h2>
-        <div className="grid grid-cols-3 gap-2 text-center text-xs">
-          <button onClick={() => onNavigate('keyword')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200">
-            <div className="text-lg font-medium text-ink-800">{keywords.length}</div>
-            <div className="text-ink-400">관심 키워드</div>
+        <div className="divide-y divide-cream-400">
+          <button
+            onClick={() => onNavigate('company')}
+            className="flex w-full flex-col items-start gap-0.5 rounded-lg px-1 py-2.5 text-left hover:bg-cream-200"
+          >
+            <span className="text-xs text-ink-400">내 업체</span>
+            {myCompany?.corpNm ? (
+              <>
+                <span className="text-sm font-medium text-ink-800">{myCompany.corpNm}</span>
+                {companySummary && <span className="text-[12px] text-ink-400">{companySummary}</span>}
+              </>
+            ) : (
+              <span className="text-sm font-medium text-ink-800">미등록</span>
+            )}
           </button>
-          <button onClick={() => onNavigate('competitor')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200">
-            <div className="text-lg font-medium text-ink-800">{competitors.length}</div>
-            <div className="text-ink-400">경쟁사</div>
+          <button
+            onClick={() => onNavigate('keyword')}
+            className="flex w-full flex-col items-start gap-0.5 rounded-lg px-1 py-2.5 text-left hover:bg-cream-200"
+          >
+            <span className="text-xs text-ink-400">관심 키워드</span>
+            <span className="text-sm font-medium text-ink-800">{keywords.length}</span>
           </button>
-          <button onClick={() => onNavigate('company')} className="rounded-lg bg-cream-50 p-3 hover:bg-cream-200">
-            <div className="text-sm font-medium text-ink-800">{myCompany?.corpNm ? '등록됨' : '미등록'}</div>
-            <div className="text-ink-400">내 업체</div>
+          <button
+            onClick={() => onNavigate('competitor')}
+            className="flex w-full flex-col items-start gap-0.5 rounded-lg px-1 py-2.5 text-left hover:bg-cream-200"
+          >
+            <span className="text-xs text-ink-400">경쟁사</span>
+            <span className="text-sm font-medium text-ink-800">{competitors.length}</span>
           </button>
         </div>
       </div>

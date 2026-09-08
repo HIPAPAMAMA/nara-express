@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { fetchCompanyByBizno } from '../../api/client';
 
 const STORAGE_KEY = 'myCompany';
@@ -42,11 +42,18 @@ export default function MyCompanyWorkspace() {
   const [autoFillError, setAutoFillError] = useState(null);
   const [qualInput, setQualInput] = useState('');
   const [perfInput, setPerfInput] = useState('');
-
-  useEffect(() => saveProfile(profile), [profile]);
+  const [dirty, setDirty] = useState(false);
+  const [savedAt, setSavedAt] = useState(null);
 
   function update(patch) {
     setProfile((p) => ({ ...p, ...patch }));
+    setDirty(true);
+  }
+
+  function handleSave() {
+    saveProfile(profile);
+    setDirty(false);
+    setSavedAt(new Date());
   }
 
   // MYC-001
@@ -89,7 +96,7 @@ export default function MyCompanyWorkspace() {
     <div className="mx-auto max-w-2xl lg:max-w-4xl">
       <div className="rounded-xl border border-cream-400 bg-cream-100 p-5">
         <h2 className="mb-1 text-base font-medium text-ink-800">내 업체</h2>
-        <p className="mb-4 text-xs text-ink-400">등록한 업체정보로 공고 적합도를 판정합니다. 고치면 자동으로 저장됩니다.</p>
+        <p className="mb-4 text-xs text-ink-400">등록한 업체정보로 공고 적합도를 판정합니다. 입력을 마치면 아래 저장하기 버튼을 눌러주세요.</p>
 
         {/* MYC-001 */}
         <div className="mb-4 flex gap-2">
@@ -256,6 +263,25 @@ export default function MyCompanyWorkspace() {
           </div>
         </div>
         </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3 border-t border-cream-400 pt-4">
+          <button
+            onClick={handleSave}
+            disabled={!dirty}
+            className="rounded-md bg-clay-400 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            저장하기
+          </button>
+          {dirty ? (
+            <span className="text-xs text-amber-800">저장하지 않은 변경사항이 있습니다.</span>
+          ) : (
+            savedAt && (
+              <span className="text-xs text-ink-300">
+                {savedAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}에 저장됨
+              </span>
+            )
+          )}
         </div>
       </div>
 
