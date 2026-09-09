@@ -20,6 +20,44 @@ export function checkHealth() {
   return request('/health');
 }
 
+// 앱 계정(가입 승인제) — 회사 이메일로 가입 신청 후 관리자 승인 필요
+export function signup({ name, email, team, password }) {
+  return request('/account/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, team, password }),
+  });
+}
+
+export function loginAccount({ email, password }) {
+  return request('/account/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export function logoutAccount() {
+  return request('/account/logout', { method: 'POST' });
+}
+
+export function getAppMe() {
+  return request('/account/me');
+}
+
+// 관리자 전용 — 가입 승인 관리
+export function listPendingUsers() {
+  return request('/admin/users');
+}
+
+export function approveUser(email) {
+  return request(`/admin/users/${encodeURIComponent(email)}/approve`, { method: 'POST' });
+}
+
+export function rejectUser(email) {
+  return request(`/admin/users/${encodeURIComponent(email)}/reject`, { method: 'POST' });
+}
+
 // SRC-005·006: 조회 잡 생성 (빠른/정밀)
 export function createSearchJob({ kind, from, to, bizType, mode, keywordType, keyword }) {
   return request(`/search/${kind}/jobs`, {

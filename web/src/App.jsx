@@ -10,8 +10,11 @@ import KeywordWorkspace from './features/keyword/KeywordWorkspace';
 import SavedWorkspace from './features/saved/SavedWorkspace';
 import SettingsWorkspace from './features/settings/SettingsWorkspace';
 import MobileBottomNav from './components/MobileBottomNav';
+import AuthGate from './features/auth/AuthGate';
+import AdminUsersWorkspace from './features/admin/AdminUsersWorkspace';
 import { checkHealth } from './api/client';
 import { AuthProvider } from './lib/authContext';
+import { AppAuthProvider, useAppAuth } from './lib/appAuthContext';
 
 // 대메뉴는 3개(통합검색·대시보드·내설정)뿐이지만, 대시보드·내설정 밑에는 실제 화면이 여러 개
 // 묶여 있어서 카드로 숨겨두면 잘 안 보인다는 피드백으로 "소분류 탭"을 항상 노출하는 2단 구조로
@@ -34,9 +37,11 @@ const TAB_GROUP_MAP = {
   evaluation: 'dashboard',
   company: 'mysettings',
   settings: 'mysettings',
+  admin: 'mysettings',
 };
 
-// 대메뉴별 소분류 탭 — 대시보드·내설정을 누르면 이 줄이 추가로 뜬다
+// 대메뉴별 소분류 탭 — 대시보드·내설정을 누르면 이 줄이 추가로 뜬다. 내설정의 "회원 관리"는
+// 관리자 계정에게만 보여야 해서 정적 목록이 아니라 AppShell 안에서 isAdmin과 합쳐 만든다.
 const SUB_NAV = {
   dashboard: [
     { key: 'dashboard', label: '요약' },
@@ -46,11 +51,11 @@ const SUB_NAV = {
     { key: 'saved', label: '저장내역' },
     { key: 'evaluation', label: '평가분석' },
   ],
-  mysettings: [
-    { key: 'company', label: '내 업체' },
-    { key: 'settings', label: '알림·설정' },
-  ],
 };
+const MYSETTINGS_SUBNAV_BASE = [
+  { key: 'company', label: '내 업체' },
+  { key: 'settings', label: '알림·설정' },
+];
 
 function Placeholder({ label }) {
   return (
@@ -62,6 +67,23 @@ function Placeholder({ label }) {
 
 export default function App() {
   return (
+    <AppAuthProvider>
+      <AppGate />
+    </AppAuthProvider>
+  );
+}
+
+// 가입 승인제 접근 게이트 — 로그인 안 됐으면 앱 화면 자체를 안 보여주고 로그인·가입 폼만 노출
+function AppGate() {
+  const appAuth = useAppAuth();
+
+  if (appAuth.status === 'checking') {
+    return <div className="flex min-h-screen items-center justify-center bg-cream-200 text-sm text-ink-400">확인 중…</div>;
+  }
+  if (!appAuth.loggedIn) {
+    return <AuthGate onLoggedIn={appAuth.refresh} />;
+  }
+  return (
     <AuthProvider>
       <AppShell />
     </AuthProvider>
@@ -69,11 +91,14 @@ export default function App() {
 }
 
 function AppShell() {
+  const appAuth = useAppAuth();
   const [health, setHealth] = useState('checking');
   const [view, setView] = useState('search');
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchPrefill, setSearchPrefill] = useState(null); // KWD-002: 키워드 클릭 → 검색 실행
   const activeGroup = TAB_GROUP_MAP[view] || 'search';
+  const mysettingsSubNav = appAuth.isAdmin ? [...MYSETTINGS_SUBNAV_BASE, { key: 'admin', label: '회원 관리' }] : MYSETTINGS_SUBNAV_BASE;
+  const subNav = activeGroup === 'mysettings' ? mysettingsSubNav : SUB_NAV[activeGroup];
 
   function handleSearchKeyword(keyword) {
     setSearchPrefill({ keyword, requestedAt: Date.now() });
@@ -91,13 +116,19 @@ function AppShell() {
       <header className="border-b border-cream-400 bg-cream-100">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-2.5">
           <img src={logo} alt="NARA express" className="h-14 w-auto" />
-          <span
-            title="공공데이터포털 나라장터 낙찰정보서비스(getScsbidListSttusServc) 연결 상태"
-            className={`flex items-center gap-1.5 text-xs ${health === 'ok' ? 'text-sage-600' : 'text-amber-600'}`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${health === 'ok' ? 'bg-sage-600' : 'bg-amber-600'}`} />
-            {health === 'checking' ? 'API 확인 중' : health === 'ok' ? 'API 정상' : 'API 응답 지연'}
-          </span>
+          <div className="flex items-center gap-3">
+            <span
+              title="공공데이터포털 나라장터 낙찰정보서비스(getScsbidListSttusServc) 연결 상태"
+              className={`flex items-center gap-1.5 text-xs ${health === 'ok' ? 'text-sage-600' : 'text-amber-600'}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${health === 'ok' ? 'bg-sage-600' : 'bg-amber-600'}`} />
+              {health === 'checking' ? 'API 확인 중' : health === 'ok' ? 'API 정상' : 'API 응답 지연'}
+            </span>
+            <span className="hidden text-xs text-ink-400 md:inline">{appAuth.name}님</span>
+            <button onClick={appAuth.logout} className="text-xs text-ink-300 hover:text-ink-600">
+              로그아웃
+            </button>
+          </div>
         </div>
         <nav className="mx-auto hidden max-w-[1600px] gap-1 overflow-x-auto px-4 pb-2 text-xs md:flex">
           {NAV_TABS.map((tab) => (
@@ -112,9 +143,9 @@ function AppShell() {
             </button>
           ))}
         </nav>
-        {SUB_NAV[activeGroup] && (
+        {subNav && (
           <nav className="mx-auto flex max-w-[1600px] gap-1 overflow-x-auto px-4 pb-2 text-xs">
-            {SUB_NAV[activeGroup].map((item) => (
+            {subNav.map((item) => (
               <button
                 key={item.key}
                 onClick={() => setView(item.key)}
@@ -139,6 +170,7 @@ function AppShell() {
         {view === 'keyword' && <KeywordWorkspace onSearchKeyword={handleSearchKeyword} />}
         {view === 'saved' && <SavedWorkspace onOpenDetail={setSelectedItem} />}
         {view === 'evaluation' && <Placeholder label="평가분석 (5단계, 보류)" />}
+        {view === 'admin' && (appAuth.isAdmin ? <AdminUsersWorkspace /> : <Placeholder label="회원 관리" />)}
       </main>
 
       {selectedItem && <DetailPanel item={selectedItem} onClose={() => setSelectedItem(null)} />}
