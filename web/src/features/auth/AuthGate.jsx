@@ -99,6 +99,7 @@ export default function AuthGate({ onLoggedIn }) {
             >
               {busy ? '확인 중…' : '로그인'}
             </button>
+            <p className="text-center text-[11px] text-ink-300">비밀번호를 잊으셨다면 관리자에게 문의해주세요.</p>
           </form>
         ) : (
           <form onSubmit={handleSignup} className="space-y-2.5">

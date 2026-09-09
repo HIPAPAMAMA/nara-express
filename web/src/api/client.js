@@ -58,6 +58,10 @@ export function rejectUser(email) {
   return request(`/admin/users/${encodeURIComponent(email)}/reject`, { method: 'POST' });
 }
 
+export function resetUserPassword(email) {
+  return request(`/admin/users/${encodeURIComponent(email)}/reset-password`, { method: 'POST' });
+}
+
 // SRC-005·006: 조회 잡 생성 (빠른/정밀)
 export function createSearchJob({ kind, from, to, bizType, mode, keywordType, keyword }) {
   return request(`/search/${kind}/jobs`, {

@@ -64,6 +64,13 @@ async function setStatus(email, status) {
   await hset(userKey(email), { status, decidedAt: new Date().toISOString() });
 }
 
+// 비밀번호를 잊었을 때 메일 발송 없이 관리자가 직접 재설정 — 가입 승인과 같은 신뢰 모델
+// (관리자가 사람을 알아보고 처리) 그대로 재사용, 새 비밀번호는 응답으로 한 번만 돌려준다.
+async function setPassword(email, newPassword) {
+  const passwordSalt = crypto.randomBytes(16).toString('hex');
+  await hset(userKey(email), { passwordSalt, passwordHash: hashPassword(newPassword, passwordSalt) });
+}
+
 // 타이밍 공격 방지를 위해 길이가 달라도 항상 같은 시간이 걸리는 비교 대신,
 // scrypt 해시(고정 64바이트)라 timingSafeEqual로 충분하다.
 function verifyPassword(user, password) {
@@ -74,4 +81,4 @@ function verifyPassword(user, password) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-module.exports = { createUser, getUser, allUserEmails, setStatus, verifyPassword };
+module.exports = { createUser, getUser, allUserEmails, setStatus, setPassword, verifyPassword };

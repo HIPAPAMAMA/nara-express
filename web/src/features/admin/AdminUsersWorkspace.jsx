@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listPendingUsers, approveUser, rejectUser } from '../../api/client';
+import { listPendingUsers, approveUser, rejectUser, resetUserPassword } from '../../api/client';
 
 const STATUS_LABEL = {
   pending: { text: '승인 대기', tone: 'bg-amber-100 text-amber-800' },
@@ -10,6 +10,7 @@ const STATUS_LABEL = {
 export default function AdminUsersWorkspace() {
   const [users, setUsers] = useState(null);
   const [busyEmail, setBusyEmail] = useState(null);
+  const [issuedPasswords, setIssuedPasswords] = useState({}); // email -> 방금 발급한 임시 비밀번호(한 번만 표시)
 
   function load() {
     listPendingUsers().then((res) => setUsers(res.users));
@@ -23,6 +24,17 @@ export default function AdminUsersWorkspace() {
       if (status === 'approved') await approveUser(email);
       else await rejectUser(email);
       load();
+    } finally {
+      setBusyEmail(null);
+    }
+  }
+
+  // 비밀번호를 잊은 사용자 — 메일 발송 없이 임시 비밀번호를 발급해 관리자가 직접 전달한다
+  async function handleResetPassword(email) {
+    setBusyEmail(email);
+    try {
+      const { newPassword } = await resetUserPassword(email);
+      setIssuedPasswords((prev) => ({ ...prev, [email]: newPassword }));
     } finally {
       setBusyEmail(null);
     }
@@ -84,16 +96,35 @@ export default function AdminUsersWorkspace() {
         ) : (
           <ul className="divide-y divide-cream-400">
             {decided.map((u) => (
-              <li key={u.email} className="flex items-center justify-between gap-3 py-2.5">
-                <div className="min-w-0">
-                  <div className="truncate text-sm text-ink-800">
-                    {u.name} <span className="text-ink-400">· {u.team}</span>
+              <li key={u.email} className="py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm text-ink-800">
+                      {u.name} <span className="text-ink-400">· {u.team}</span>
+                    </div>
+                    <div className="truncate text-[12px] text-ink-400">{u.email}</div>
                   </div>
-                  <div className="truncate text-[12px] text-ink-400">{u.email}</div>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${STATUS_LABEL[u.status]?.tone}`}>
+                      {STATUS_LABEL[u.status]?.text}
+                    </span>
+                    {u.status === 'approved' && (
+                      <button
+                        onClick={() => handleResetPassword(u.email)}
+                        disabled={busyEmail === u.email}
+                        className="rounded-md border border-cream-400 px-2 py-1 text-[11px] text-ink-600 disabled:opacity-50"
+                      >
+                        비밀번호 재설정
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[11px] font-medium ${STATUS_LABEL[u.status]?.tone}`}>
-                  {STATUS_LABEL[u.status]?.text}
-                </span>
+                {issuedPasswords[u.email] && (
+                  <p className="mt-1.5 rounded-md bg-sage-100 px-2.5 py-1.5 text-[12px] text-sage-600">
+                    임시 비밀번호: <span className="font-mono font-medium">{issuedPasswords[u.email]}</span>
+                    {' — '}본인에게 직접 전달해주세요. (이 화면을 벗어나면 다시 볼 수 없습니다)
+                  </p>
+                )}
               </li>
             ))}
           </ul>
